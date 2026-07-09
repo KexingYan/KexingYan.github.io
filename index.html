@@ -319,6 +319,32 @@
       background: #fff;
     }
 
+    .item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .paper-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .paper-link:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
     .skills {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -565,29 +591,33 @@
       <div class="section-grid">
         <div>
           <p class="section-kicker">03 Research</p>
-          <h2 id="research-title">Selected project.</h2>
+          <h2 id="research-title">Selected research paper.</h2>
         </div>
         <div class="list">
           <article class="item">
             <div class="item-head">
               <div>
-                <h3>Kiva Microfinance and Economic Development</h3>
-                <p>ECO225 final project</p>
+                <h3>The Quantity and Size of Microloans Follow Different Development Logics: Evidence from Kiva</h3>
+                <p>Research paper</p>
               </div>
-              <span class="meta">2013-2017 data</span>
+              <span class="meta">July 2026</span>
             </div>
             <p>
-              Built a country-level panel dataset by merging Kiva loan activity, World Bank indicators, and institutional datasets. The analysis explored the relationship between GDP per capita and microfinance activity across 84 countries and 357 observations.
+              This paper studies how Kiva microfinance activity relates to economic development across an 84-country panel from 2013 to 2017, separating total lending volume, individual loan size, and whether Kiva operates in a country at all.
             </p>
             <p>
-              Methods included OLS regressions, interaction modeling, and a PCA-based institutional quality index, with analysis conducted in Python and SQL.
+              The analysis finds that total lending volume does not show a significant inverted-U relationship, loan size follows a significant U-shape, and Kiva's country entry pattern is more nuanced than a simple middle-income peak.
             </p>
             <div class="tags">
               <span class="tag">Python</span>
               <span class="tag">pandas</span>
               <span class="tag">statsmodels</span>
-              <span class="tag">SQL</span>
+              <span class="tag">Logit</span>
+              <span class="tag">PPML</span>
               <span class="tag">Econometrics</span>
+            </div>
+            <div class="item-actions">
+              <a class="paper-link" href="papers/the-quantity-and-size-of-microloans.pdf" target="_blank" rel="noreferrer">Read paper PDF</a>
             </div>
           </article>
         </div>
