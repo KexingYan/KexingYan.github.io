@@ -1,0 +1,19 @@
+{
+  "name": "Kexing Yan",
+  "short_name": "Kexing",
+  "icons": [
+    {
+      "src": "assets/icons/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#171717",
+  "background_color": "#fbfbf8",
+  "display": "standalone"
+}
