@@ -91,6 +91,53 @@
       color: var(--text);
     }
 
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .lang-btn {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      font: inherit;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .lang-btn:hover {
+      color: var(--text);
+    }
+
+    .lang-btn.active {
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .lang-sep {
+      color: var(--line);
+      user-select: none;
+    }
+
+    /* Anti-flicker: applies only to Chinese visitors before the main script
+       runs. The boot script sets html[data-lang="zh"] before first paint, so
+       translated nodes stay hidden until the main script swaps their text and
+       adds .i18n-ready. No-JS and English visitors never match this rule, so
+       the canonical English content renders immediately. */
+    html[data-lang="zh"]:not(.i18n-ready) [data-i18n] {
+      visibility: hidden;
+    }
+
     main {
       max-width: var(--max);
       margin: 0 auto;
@@ -423,6 +470,13 @@
         flex-direction: column;
       }
 
+      .nav-right {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
       .nav-links {
         width: 100%;
         overflow-x: auto;
@@ -484,56 +538,82 @@
   </style>
 </head>
 <body>
+  <!-- i18n boot script: runs before first paint and stands alone (does not
+       depend on the main script at the end of <body>). It reads the saved
+       language and sets <html lang> + data-lang so screen readers and the
+       anti-flicker CSS see the chosen language before content is drawn.
+       Default is always English; navigator.language is intentionally ignored. -->
+  <script>
+    (function () {
+      var lang = "en";
+      try {
+        if (localStorage.getItem("kx-site-lang") === "zh") lang = "zh";
+      } catch (e) {}
+      var html = document.documentElement;
+      html.setAttribute("data-lang", lang);
+      html.lang = lang === "zh" ? "zh-Hans" : "en";
+    })();
+  </script>
+
   <header class="site-header">
-    <nav class="nav" aria-label="Primary navigation">
+    <nav class="nav" aria-label="Primary navigation" data-i18n-attr="aria-label:nav.aria">
       <a class="brand" href="#top">Kexing Yan</a>
-      <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#research">Research</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#about" data-i18n="nav.about">About</a></li>
+          <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+          <li><a href="#research" data-i18n="nav.research">Research</a></li>
+          <li><a href="#experience" data-i18n="nav.experience">Experience</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+        </ul>
+        <!-- Language toggle. EN / 中文 are language endonyms, shown untranslated
+             in both states; the active one is highlighted. -->
+        <div class="lang-toggle" role="group" aria-label="Language" data-i18n-attr="aria-label:langToggle.aria">
+          <button type="button" class="lang-btn active" id="lang-en" aria-pressed="true">EN</button>
+          <span class="lang-sep" aria-hidden="true">/</span>
+          <button type="button" class="lang-btn" id="lang-zh" aria-pressed="false">中文</button>
+        </div>
+      </div>
     </nav>
   </header>
 
   <main id="top">
     <section class="hero" aria-labelledby="intro-title">
       <div>
-        <p class="eyebrow">Open to internships</p>
-        <h1 id="intro-title">Statistics and Economics student focused on applied data work.</h1>
-        <p class="hero-summary">
+        <p class="eyebrow" data-i18n="hero.eyebrow">Open to internships</p>
+        <h1 id="intro-title" data-i18n="hero.title">Statistics and Economics student focused on applied data work.</h1>
+        <p class="hero-summary" data-i18n="hero.summary">
           I am Kexing Yan, an Honours BSc student at the University of Toronto, double-majoring in Economics with a Data Analytics focus and Statistics. I work with data, econometrics, and clear research questions.
         </p>
         <div class="hero-actions">
-          <a class="button" href="#research">View research</a>
-          <a class="button secondary" href="#contact">Email me</a>
-          <a class="button secondary" id="resume-link-hero" href="assets/resume/Kexing-Yan-Resume-EN.pdf" target="_blank" rel="noopener">Résumé</a>
+          <a class="button" href="#research" data-i18n="hero.viewResearch">View research</a>
+          <a class="button secondary" href="#contact" data-i18n="hero.emailMe">Email me</a>
+          <a class="button secondary" id="resume-link-hero" href="assets/resume/Kexing-Yan-Resume-EN.pdf" target="_blank" rel="noopener" data-i18n="hero.resume">Résumé</a>
         </div>
       </div>
 
-      <aside class="profile-panel" aria-label="Profile summary">
+      <aside class="profile-panel" aria-label="Profile summary" data-i18n-attr="aria-label:profile.aria">
         <div class="initials">KY</div>
         <dl class="profile-list">
           <div class="profile-row">
-            <dt>School</dt>
-            <dd>University of Toronto, UTSG</dd>
+            <dt data-i18n="profile.schoolLabel">School</dt>
+            <dd data-i18n="profile.schoolValue">University of Toronto, UTSG</dd>
           </div>
           <div class="profile-row">
-            <dt>Degree</dt>
-            <dd>HBSc, Double Major</dd>
+            <dt data-i18n="profile.degreeLabel">Degree</dt>
+            <dd data-i18n="profile.degreeValue">HBSc, Double Major</dd>
           </div>
           <div class="profile-row">
-            <dt>Focus</dt>
-            <dd>Economics, Data Analytics, Statistics</dd>
+            <dt data-i18n="profile.focusLabel">Focus</dt>
+            <dd data-i18n="profile.focusValue">Economics, Data Analytics, Statistics</dd>
           </div>
           <div class="profile-row">
-            <dt>Class</dt>
-            <dd>2028</dd>
+            <dt data-i18n="profile.classLabel">Class</dt>
+            <dd data-i18n="profile.classValue">2028</dd>
           </div>
           <div class="profile-row">
-            <dt>Location</dt>
-            <dd>Toronto, Ontario</dd>
+            <dt data-i18n="profile.locationLabel">Location</dt>
+            <dd data-i18n="profile.locationValue">Toronto, Ontario</dd>
           </div>
         </dl>
       </aside>
@@ -542,17 +622,17 @@
     <section id="about" aria-labelledby="about-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker">01 About</p>
-          <h2 id="about-title">I like making quantitative work readable and useful.</h2>
+          <p class="section-kicker" data-i18n="about.kicker">01 About</p>
+          <h2 id="about-title" data-i18n="about.title">I like making quantitative work readable and useful.</h2>
         </div>
         <div class="section-copy">
-          <p>
+          <p data-i18n="about.p1">
             My academic path sits between economic reasoning and statistical practice. I am especially interested in how data can clarify questions about development, institutions, markets, and decision-making.
           </p>
-          <p>
+          <p data-i18n="about.p2">
             Recent work includes building a panel dataset across 84 countries and studying the relationship between microfinance activity and economic development using regression models, PCA, and Python-based analysis workflows.
           </p>
-          <p>
+          <p data-i18n="about.p3">
             I am looking for internships and research opportunities where I can contribute careful data cleaning, statistical analysis, and concise communication.
           </p>
         </div>
@@ -562,8 +642,8 @@
     <section id="skills" aria-labelledby="skills-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker">02 Skills</p>
-          <h2 id="skills-title">Tools I use most often.</h2>
+          <p class="section-kicker" data-i18n="skills.kicker">02 Skills</p>
+          <h2 id="skills-title" data-i18n="skills.title">Tools I use most often.</h2>
         </div>
         <div class="skills">
           <div class="skill">
@@ -572,22 +652,22 @@
           </div>
           <div class="skill">
             <strong>SQL</strong>
-            <span>Querying, filtering, aggregation, large dataset workflows</span>
+            <span data-i18n="skills.sql">Querying, filtering, aggregation, large dataset workflows</span>
           </div>
           <div class="skill">
             <strong>R</strong>
-            <span>Statistical analysis, data handling, base R</span>
+            <span data-i18n="skills.r">Statistical analysis, data handling, base R</span>
           </div>
           <div class="skill">
-            <strong>Statistics</strong>
-            <span>Regression, hypothesis testing, PCA, EDA, inference</span>
+            <strong data-i18n="skills.statisticsName">Statistics</strong>
+            <span data-i18n="skills.statistics">Regression, hypothesis testing, PCA, EDA, inference</span>
           </div>
           <div class="skill">
-            <strong>Econometrics</strong>
-            <span>OLS regression, panel data, interaction terms, fixed effects</span>
+            <strong data-i18n="skills.econometricsName">Econometrics</strong>
+            <span data-i18n="skills.econometrics">OLS regression, panel data, interaction terms, fixed effects</span>
           </div>
           <div class="skill">
-            <strong>Workflow</strong>
+            <strong data-i18n="skills.workflowName">Workflow</strong>
             <span>Git, GitHub, Jupyter, Excel, LaTeX</span>
           </div>
         </div>
@@ -597,22 +677,22 @@
     <section id="research" aria-labelledby="research-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker">03 Research</p>
-          <h2 id="research-title">Selected research paper.</h2>
+          <p class="section-kicker" data-i18n="research.kicker">03 Research</p>
+          <h2 id="research-title" data-i18n="research.title">Selected research paper.</h2>
         </div>
         <div class="list">
           <article class="item">
             <div class="item-head">
               <div>
-                <h3>The Quantity and Size of Microloans Follow Different Development Logics: Evidence from Kiva</h3>
-                <p>Research paper</p>
+                <h3 data-i18n="research.paperTitle">The Quantity and Size of Microloans Follow Different Development Logics: Evidence from Kiva</h3>
+                <p data-i18n="research.paperType">Research paper</p>
               </div>
-              <span class="meta">July 2026</span>
+              <span class="meta" data-i18n="research.date">July 2026</span>
             </div>
-            <p>
+            <p data-i18n="research.abstract1">
               This paper studies how Kiva microfinance activity relates to economic development across an 84-country panel from 2013 to 2017, separating total lending volume, individual loan size, and whether Kiva operates in a country at all.
             </p>
-            <p>
+            <p data-i18n="research.abstract2">
               The analysis finds that total lending volume does not show a significant inverted-U relationship, loan size follows a significant U-shape, and Kiva's country entry pattern is more nuanced than a simple middle-income peak.
             </p>
             <div class="tags">
@@ -621,10 +701,10 @@
               <span class="tag">statsmodels</span>
               <span class="tag">Logit</span>
               <span class="tag">PPML</span>
-              <span class="tag">Econometrics</span>
+              <span class="tag" data-i18n="research.tagEconometrics">Econometrics</span>
             </div>
             <div class="item-actions">
-              <a class="paper-link" href="papers/the-quantity-and-size-of-microloans.pdf" target="_blank" rel="noreferrer">Read paper PDF</a>
+              <a class="paper-link" href="papers/the-quantity-and-size-of-microloans.pdf" target="_blank" rel="noreferrer" data-i18n="research.readPaper">Read paper PDF</a>
             </div>
           </article>
         </div>
@@ -634,32 +714,32 @@
     <section id="experience" aria-labelledby="experience-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker">04 Experience</p>
-          <h2 id="experience-title">Seminars and honours.</h2>
+          <p class="section-kicker" data-i18n="experience.kicker">04 Experience</p>
+          <h2 id="experience-title" data-i18n="experience.title">Seminars and honours.</h2>
         </div>
         <div class="list">
           <article class="item">
             <div class="item-head">
               <div>
-                <h3>Participant, Online Economics and Finance Seminars</h3>
+                <h3 data-i18n="experience.item1Title">Participant, Online Economics and Finance Seminars</h3>
                 <p>CFA Institute</p>
               </div>
-              <span class="meta">2024-present</span>
+              <span class="meta" data-i18n="experience.item1Date">2024-present</span>
             </div>
             <ul>
-              <li>Attended seminars covering macroeconomic trends, monetary policy, and global financial markets.</li>
+              <li data-i18n="experience.item1Bullet">Attended seminars covering macroeconomic trends, monetary policy, and global financial markets.</li>
             </ul>
           </article>
 
           <article class="item">
             <div class="item-head">
               <div>
-                <h3>University of Toronto Entrance Scholarship</h3>
-                <p>Academic honour</p>
+                <h3 data-i18n="experience.item2Title">University of Toronto Entrance Scholarship</h3>
+                <p data-i18n="experience.item2Type">Academic honour</p>
               </div>
-              <span class="meta">UofT UTSG</span>
+              <span class="meta" data-i18n="experience.item2Meta">UofT UTSG</span>
             </div>
-            <p>Merit-based scholarship awarded upon admission for academic excellence.</p>
+            <p data-i18n="experience.item2Desc">Merit-based scholarship awarded upon admission for academic excellence.</p>
           </article>
         </div>
       </div>
@@ -668,16 +748,16 @@
     <section id="contact" aria-labelledby="contact-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker">05 Contact</p>
-          <h2 id="contact-title">Let us connect.</h2>
+          <p class="section-kicker" data-i18n="contact.kicker">05 Contact</p>
+          <h2 id="contact-title" data-i18n="contact.title">Let us connect.</h2>
         </div>
         <div class="contact-block">
           <a class="contact-link" href="mailto:ykx050915@gmail.com">
-            <span class="contact-label">Personal Email</span>
+            <span class="contact-label" data-i18n="contact.personalEmailLabel">Personal Email</span>
             <span class="contact-value">ykx050915@gmail.com</span>
           </a>
           <a class="contact-link" href="mailto:kexing.yan@mail.utoronto.ca">
-            <span class="contact-label">University Email</span>
+            <span class="contact-label" data-i18n="contact.universityEmailLabel">University Email</span>
             <span class="contact-value">kexing.yan@mail.utoronto.ca</span>
           </a>
           <a class="contact-link" href="https://linkedin.com/in/kexing-yan" target="_blank" rel="noreferrer">
@@ -697,9 +777,178 @@
     </section>
   </main>
 
-  <footer>
+  <footer data-i18n="footer.text">
     © 2026 Kexing Yan. University of Toronto · Statistics & Economics.
   </footer>
+
+  <script>
+    // ---- Bilingual (EN/ZH) client-side switch --------------------------------
+    // The HTML holds the canonical English copy; this dictionary holds only the
+    // Chinese strings, keyed by the element's data-i18n value. Switching to zh
+    // replaces textContent from this dictionary; switching back to en restores
+    // from a snapshot of the original HTML taken at load (no separate `en`
+    // dictionary that could drift from the source). Default language is English.
+    (function () {
+      var STORAGE_KEY = "kx-site-lang";
+      var html = document.documentElement;
+
+      var translations = {
+        zh: {
+          // Navigation
+          "nav.about": "关于",
+          "nav.skills": "技能",
+          "nav.research": "研究",
+          "nav.experience": "经历",
+          "nav.contact": "联系",
+          "nav.aria": "主导航",
+          "langToggle.aria": "语言",
+          // Hero
+          "hero.eyebrow": "正在寻找实习",
+          "hero.title": "专注于应用数据工作的统计学与经济学学生。",
+          "hero.summary": "我是 Kexing Yan，University of Toronto 理学荣誉学士在读，经济学（数据分析方向）与统计学双专业。我的工作围绕数据、计量经济学与明确的研究问题展开。",
+          "hero.viewResearch": "查看研究",
+          "hero.emailMe": "发邮件给我",
+          "hero.resume": "简历",
+          // Profile card
+          "profile.aria": "个人信息摘要",
+          "profile.schoolLabel": "学校",
+          "profile.schoolValue": "University of Toronto，圣乔治校区",
+          "profile.degreeLabel": "学位",
+          "profile.degreeValue": "理学荣誉学士（HBSc），双专业",
+          "profile.focusLabel": "方向",
+          "profile.focusValue": "经济学、数据分析、统计学",
+          "profile.classLabel": "届别",
+          "profile.classValue": "2028 届",
+          "profile.locationLabel": "所在地",
+          "profile.locationValue": "安大略省多伦多",
+          // About
+          "about.kicker": "01 关于",
+          "about.title": "我希望让量化研究既易读又实用。",
+          "about.p1": "我的学术路径介于经济学推理与统计实践之间。我尤其关注数据如何厘清有关发展、制度、市场与决策的问题。",
+          "about.p2": "近期工作包括构建覆盖 84 个国家的面板数据集，并运用回归模型、主成分分析（PCA）与基于 Python 的分析流程，研究小额信贷活动与经济发展之间的关系。",
+          "about.p3": "我正在寻找实习与研究机会，以贡献严谨的数据清洗、统计分析与简洁的表达。",
+          // Skills
+          "skills.kicker": "02 技能",
+          "skills.title": "最常使用的工具。",
+          "skills.sql": "查询、筛选、聚合、大数据集处理流程",
+          "skills.r": "统计分析、数据处理、base R",
+          "skills.statisticsName": "统计学",
+          "skills.statistics": "回归、假设检验、主成分分析（PCA）、探索性数据分析（EDA）、统计推断",
+          "skills.econometricsName": "计量经济学",
+          "skills.econometrics": "普通最小二乘（OLS）回归、面板数据、交互项、固定效应",
+          "skills.workflowName": "工作流",
+          // Research
+          "research.kicker": "03 研究",
+          "research.title": "精选研究论文。",
+          "research.paperTitle": "《小额信贷的数量与规模遵循不同的发展逻辑：来自 Kiva 的证据》",
+          "research.paperType": "研究论文",
+          "research.date": "2026 年 7 月",
+          "research.abstract1": "本文基于 2013 至 2017 年、覆盖 84 个国家的面板数据，研究 Kiva 小额信贷活动与经济发展的关系，并将总放贷量、单笔贷款规模，以及 Kiva 是否在某国开展业务三者区分开来。",
+          "research.abstract2": "分析发现，总放贷量并未呈现显著的倒 U 型关系，单笔贷款规模呈现显著的 U 型，而 Kiva 的国家进入模式比简单的中等收入峰值更为复杂。",
+          "research.tagEconometrics": "计量经济学",
+          "research.readPaper": "阅读论文 PDF",
+          // Experience
+          "experience.kicker": "04 经历",
+          "experience.title": "研讨会与荣誉。",
+          "experience.item1Title": "线上经济与金融研讨会参与者",
+          "experience.item1Date": "2024 年至今",
+          "experience.item1Bullet": "参加涵盖宏观经济趋势、货币政策与全球金融市场的研讨会。",
+          "experience.item2Title": "University of Toronto 入学奖学金",
+          "experience.item2Type": "学术荣誉",
+          "experience.item2Meta": "University of Toronto · 圣乔治校区",
+          "experience.item2Desc": "因学术优异在录取时授予的择优奖学金。",
+          // Contact
+          "contact.kicker": "05 联系",
+          "contact.title": "保持联系。",
+          "contact.personalEmailLabel": "个人邮箱",
+          "contact.universityEmailLabel": "校园邮箱",
+          "contact.resumeLabel": "简历",
+          "contact.resumeValue": "下载 PDF",
+          // Footer
+          "footer.text": "© 2026 Kexing Yan · University of Toronto · 统计学与经济学"
+        }
+      };
+
+      // Elements whose textContent is translated.
+      var textNodes = document.querySelectorAll("[data-i18n]");
+      // Elements with a translated attribute. Convention: data-i18n-attr holds
+      // one or more "attrName:key" pairs, comma-separated, e.g.
+      // data-i18n-attr="aria-label:nav.aria".
+      var attrNodes = document.querySelectorAll("[data-i18n-attr]");
+      // Resume links: same href in both languages except the EN/ZH suffix.
+      var resumeLinks = document.querySelectorAll("#resume-link-hero, #resume-link-contact");
+
+      var btnEn = document.getElementById("lang-en");
+      var btnZh = document.getElementById("lang-zh");
+
+      // Snapshot the original English text and attribute values.
+      var enText = {};
+      textNodes.forEach(function (el) {
+        enText[el.getAttribute("data-i18n")] = el.textContent;
+      });
+      var enAttr = {};
+      function eachAttrPair(el, fn) {
+        el.getAttribute("data-i18n-attr").split(",").forEach(function (pair) {
+          var bits = pair.split(":");
+          fn(bits[0].trim(), bits[1].trim());
+        });
+      }
+      attrNodes.forEach(function (el) {
+        eachAttrPair(el, function (attr, key) {
+          enAttr[key] = el.getAttribute(attr);
+        });
+      });
+
+      function apply(lang) {
+        var dict = lang === "zh" ? translations.zh : null;
+        textNodes.forEach(function (el) {
+          var key = el.getAttribute("data-i18n");
+          el.textContent = dict && dict[key] != null ? dict[key] : enText[key];
+        });
+        attrNodes.forEach(function (el) {
+          eachAttrPair(el, function (attr, key) {
+            el.setAttribute(attr, dict && dict[key] != null ? dict[key] : enAttr[key]);
+          });
+        });
+        resumeLinks.forEach(function (el) {
+          el.setAttribute(
+            "href",
+            "assets/resume/Kexing-Yan-Resume-" + (lang === "zh" ? "ZH" : "EN") + ".pdf"
+          );
+        });
+        html.lang = lang === "zh" ? "zh-Hans" : "en";
+        html.setAttribute("data-lang", lang);
+        if (btnEn) {
+          btnEn.classList.toggle("active", lang !== "zh");
+          btnEn.setAttribute("aria-pressed", String(lang !== "zh"));
+        }
+        if (btnZh) {
+          btnZh.classList.toggle("active", lang === "zh");
+          btnZh.setAttribute("aria-pressed", String(lang === "zh"));
+        }
+      }
+
+      function setLang(lang) {
+        try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+        apply(lang);
+      }
+
+      // Initial language: saved choice, else English. Read here (not navigator).
+      var initial = "en";
+      try { if (localStorage.getItem(STORAGE_KEY) === "zh") initial = "zh"; } catch (e) {}
+
+      try {
+        apply(initial);
+      } finally {
+        // Reveal content even if apply threw, so the anti-flicker CSS never
+        // leaves Chinese visitors with permanently hidden text.
+        html.classList.add("i18n-ready");
+      }
+
+      if (btnEn) btnEn.addEventListener("click", function () { setLang("en"); });
+      if (btnZh) btnZh.addEventListener("click", function () { setLang("zh"); });
+    })();
+  </script>
 
   <script>
     const links = document.querySelectorAll(".nav-links a");
