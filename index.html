@@ -563,7 +563,7 @@
           <li><a href="#about" data-i18n="nav.about">About</a></li>
           <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
           <li><a href="#research" data-i18n="nav.research">Research</a></li>
-          <li><a href="#experience" data-i18n="nav.experience">Experience</a></li>
+          <li><a href="#experience" data-i18n="nav.experience">Honours</a></li>
           <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
         <!-- Language toggle. EN / 中文 are language endonyms, shown untranslated
@@ -580,7 +580,7 @@
   <main id="top">
     <section class="hero" aria-labelledby="intro-title">
       <div>
-        <p class="eyebrow" data-i18n="hero.eyebrow">Open to internships</p>
+        <p class="eyebrow" data-i18n="hero.eyebrow">Open to Summer 2027 internships</p>
         <h1 id="intro-title" data-i18n="hero.title">Statistics and Economics student focused on applied data work.</h1>
         <p class="hero-summary" data-i18n="hero.summary">
           I am Kexing Yan, an Honours BSc student at the University of Toronto, double-majoring in Economics with a Data Analytics focus and Statistics. I work with data, econometrics, and clear research questions.
@@ -648,7 +648,7 @@
         <div class="skills">
           <div class="skill">
             <strong>Python</strong>
-            <span>pandas, NumPy, matplotlib, statsmodels, scikit-learn</span>
+            <span data-i18n="skills.python">pandas, NumPy, matplotlib, statsmodels, scikit-learn — cleaning and panel construction from over a million loan records.</span>
           </div>
           <div class="skill">
             <strong>SQL</strong>
@@ -660,11 +660,11 @@
           </div>
           <div class="skill">
             <strong data-i18n="skills.statisticsName">Statistics</strong>
-            <span data-i18n="skills.statistics">Regression, hypothesis testing, PCA, EDA, inference</span>
+            <span data-i18n="skills.statistics">PCA used to build an institutional-quality index; regression, hypothesis testing, and EDA.</span>
           </div>
           <div class="skill">
             <strong data-i18n="skills.econometricsName">Econometrics</strong>
-            <span data-i18n="skills.econometrics">OLS regression, panel data, interaction terms, fixed effects</span>
+            <span data-i18n="skills.econometrics">PPML and Logit models, average marginal effects, clustered standard errors, and turning-point tests, from the Kiva paper.</span>
           </div>
           <div class="skill">
             <strong data-i18n="skills.workflowName">Workflow</strong>
@@ -693,7 +693,7 @@
               This paper studies how Kiva microfinance activity relates to economic development across an 84-country panel from 2013 to 2017, separating total lending volume, individual loan size, and whether Kiva operates in a country at all.
             </p>
             <p data-i18n="research.abstract2">
-              The analysis finds that total lending volume does not show a significant inverted-U relationship, loan size follows a significant U-shape, and Kiva's country entry pattern is more nuanced than a simple middle-income peak.
+              Loan size follows a significant U-shaped relationship with development level, while total lending volume shows no significant inverted-U — the two dimensions of microfinance activity are driven by different mechanisms. Kiva's country entry pattern is more nuanced than a simple middle-income peak.
             </p>
             <div class="tags">
               <span class="tag">Python</span>
@@ -705,6 +705,13 @@
             </div>
             <div class="item-actions">
               <a class="paper-link" href="papers/the-quantity-and-size-of-microloans.pdf" target="_blank" rel="noreferrer" data-i18n="research.readPaper">Read paper PDF</a>
+              <!-- TODO: repo URL — BLOCKED. No confirmed public GitHub repo for the
+                   Kiva paper (the only known repo is the private GitHub Classroom
+                   one at github.com/ECO225-2026/eco225-project-KexingYan). When a
+                   public URL is provided, uncomment the anchor below, set href, and
+                   add a "research.viewCode": "查看代码" entry to translations.zh:
+              <a class="paper-link" href="REPO_URL" target="_blank" rel="noreferrer" data-i18n="research.viewCode">View code</a>
+              -->
             </div>
           </article>
         </div>
@@ -714,8 +721,8 @@
     <section id="experience" aria-labelledby="experience-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker" data-i18n="experience.kicker">04 Experience</p>
-          <h2 id="experience-title" data-i18n="experience.title">Seminars and honours.</h2>
+          <p class="section-kicker" data-i18n="experience.kicker">04 Honours &amp; Activities</p>
+          <h2 id="experience-title" data-i18n="experience.title">Scholarships, seminars, and activities.</h2>
         </div>
         <div class="list">
           <article class="item">
@@ -749,7 +756,7 @@
       <div class="section-grid">
         <div>
           <p class="section-kicker" data-i18n="contact.kicker">05 Contact</p>
-          <h2 id="contact-title" data-i18n="contact.title">Let us connect.</h2>
+          <h2 id="contact-title" data-i18n="contact.title">Let's connect.</h2>
         </div>
         <div class="contact-block">
           <a class="contact-link" href="mailto:ykx050915@gmail.com">
@@ -798,12 +805,12 @@
           "nav.about": "关于",
           "nav.skills": "技能",
           "nav.research": "研究",
-          "nav.experience": "经历",
+          "nav.experience": "荣誉",
           "nav.contact": "联系",
           "nav.aria": "主导航",
           "langToggle.aria": "语言",
           // Hero
-          "hero.eyebrow": "正在寻找实习",
+          "hero.eyebrow": "正在寻找 2027 年暑期实习",
           "hero.title": "专注于应用数据工作的统计学与经济学学生。",
           "hero.summary": "我是 Kexing Yan，University of Toronto 理学荣誉学士在读，经济学（数据分析方向）与统计学双专业。我的工作围绕数据、计量经济学与明确的研究问题展开。",
           "hero.viewResearch": "查看研究",
@@ -830,12 +837,13 @@
           // Skills
           "skills.kicker": "02 技能",
           "skills.title": "最常使用的工具。",
+          "skills.python": "pandas、NumPy、matplotlib、statsmodels、scikit-learn —— 对逾百万条贷款记录进行清洗与面板构建。",
           "skills.sql": "查询、筛选、聚合、大数据集处理流程",
           "skills.r": "统计分析、数据处理、base R",
           "skills.statisticsName": "统计学",
-          "skills.statistics": "回归、假设检验、主成分分析（PCA）、探索性数据分析（EDA）、统计推断",
+          "skills.statistics": "以主成分分析（PCA）构建制度质量指数；以及回归、假设检验与探索性数据分析（EDA）。",
           "skills.econometricsName": "计量经济学",
-          "skills.econometrics": "普通最小二乘（OLS）回归、面板数据、交互项、固定效应",
+          "skills.econometrics": "PPML 与 Logit 模型、平均边际效应、聚类标准误与拐点检验，均出自 Kiva 论文。",
           "skills.workflowName": "工作流",
           // Research
           "research.kicker": "03 研究",
@@ -844,12 +852,12 @@
           "research.paperType": "研究论文",
           "research.date": "2026 年 7 月",
           "research.abstract1": "本文基于 2013 至 2017 年、覆盖 84 个国家的面板数据，研究 Kiva 小额信贷活动与经济发展的关系，并将总放贷量、单笔贷款规模，以及 Kiva 是否在某国开展业务三者区分开来。",
-          "research.abstract2": "分析发现，总放贷量并未呈现显著的倒 U 型关系，单笔贷款规模呈现显著的 U 型，而 Kiva 的国家进入模式比简单的中等收入峰值更为复杂。",
+          "research.abstract2": "单笔贷款规模与发展水平呈现显著的 U 型关系，而总放贷量并未呈现显著的倒 U 型——小额信贷活动的这两个维度由不同的机制驱动。Kiva 的国家进入模式比简单的中等收入峰值更为复杂。",
           "research.tagEconometrics": "计量经济学",
           "research.readPaper": "阅读论文 PDF",
           // Experience
-          "experience.kicker": "04 经历",
-          "experience.title": "研讨会与荣誉。",
+          "experience.kicker": "04 荣誉与活动",
+          "experience.title": "奖学金、研讨会与活动。",
           "experience.item1Title": "线上经济与金融研讨会参与者",
           "experience.item1Date": "2024 年至今",
           "experience.item1Bullet": "参加涵盖宏观经济趋势、货币政策与全球金融市场的研讨会。",
