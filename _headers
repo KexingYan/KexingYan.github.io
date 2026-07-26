@@ -1,0 +1,6 @@
+# Cloudflare Pages custom headers.
+# Keep résumé PDFs out of search indexes: they contain a plaintext personal
+# email that would otherwise be exposed to crawlers. Trade-off: the résumé
+# files themselves will not appear in search results.
+/assets/resume/*
+  X-Robots-Tag: noindex
