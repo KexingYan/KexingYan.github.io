@@ -1,0 +1,12 @@
+# Kexing Yan (严可行)
+
+> Official first-party website for Kexing Yan, a University of Toronto student studying Economics and Statistics with a focus on Data Analytics.
+
+## Canonical resources
+
+- Homepage: https://kexingyan.com/
+- Student working paper: https://kexingyan.com/research/microloan-quantity-size/
+- Paper PDF: https://kexingyan.com/papers/the-quantity-and-size-of-microloans.pdf
+- Public analysis code: https://github.com/KexingYan/kiva-microfinance-development
+
+This file is a concise navigation aid. The canonical HTML pages, structured data, robots.txt, and sitemap.xml remain the authoritative discovery sources.

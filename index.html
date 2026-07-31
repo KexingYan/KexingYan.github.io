@@ -18,6 +18,7 @@
   <meta property="og:site_name" content="Kexing Yan" />
   <meta property="og:locale" content="en_CA" />
   <meta property="og:image" content="https://kexingyan.com/assets/images/kexing-yan-open-graph.png" />
+  <meta property="og:image:secure_url" content="https://kexingyan.com/assets/images/kexing-yan-open-graph.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Kexing Yan · 严可行 — Economics and Statistics, University of Toronto, Data Analytics" />
@@ -32,7 +33,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48x48.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="assets/icons/kx-logo.png">
   <link rel="manifest" href="site.webmanifest">
   <script type="application/ld+json">
   {
@@ -43,11 +43,13 @@
         "@id": "https://kexingyan.com/#website",
         "url": "https://kexingyan.com/",
         "name": "Kexing Yan",
-        "alternateName": "Kexing Yan Portfolio",
         "publisher": {
           "@id": "https://kexingyan.com/#person"
         },
-        "inLanguage": "en-CA"
+        "inLanguage": [
+          "en-CA",
+          "zh-Hans"
+        ]
       },
       {
         "@type": "ProfilePage",
@@ -58,7 +60,14 @@
         "mainEntity": {
           "@id": "https://kexingyan.com/#person"
         },
-        "inLanguage": "en-CA"
+        "isPartOf": {
+          "@id": "https://kexingyan.com/#website"
+        },
+        "dateModified": "2026-07-31",
+        "inLanguage": [
+          "en-CA",
+          "zh-Hans"
+        ]
       },
       {
         "@type": "Person",
@@ -67,24 +76,27 @@
         "alternateName": "严可行",
         "url": "https://kexingyan.com/",
         "description": "Honours BSc student at the University of Toronto studying Economics and Statistics with a focus on Data Analytics.",
-        "jobTitle": "Economics and Statistics Student",
         "affiliation": {
-          "@type": "CollegeOrUniversity",
-          "name": "University of Toronto",
-          "sameAs": "https://www.utoronto.ca/"
+          "@id": "https://kexingyan.com/#university-of-toronto"
+        },
+        "mainEntityOfPage": {
+          "@id": "https://kexingyan.com/#profile"
         },
         "knowsAbout": [
           "Economics",
           "Statistics",
-          "Data Analytics",
-          "Econometrics",
-          "Applied Data Analysis",
-          "Financial Research"
+          "Data Analytics"
         ],
         "sameAs": [
           "https://linkedin.com/in/kexing-yan",
           "https://github.com/KexingYan"
         ]
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "@id": "https://kexingyan.com/#university-of-toronto",
+        "name": "University of Toronto",
+        "url": "https://www.utoronto.ca/"
       }
     ]
   }
@@ -95,7 +107,7 @@
       --paper: #ffffff;
       --text: #171717;
       --muted: #666666;
-      --soft: #8a8a8a;
+      --soft: #6f6f6f;
       --line: #e8e5dc;
       --accent: #2454a6;
       --accent-soft: #eef3ff;
@@ -120,6 +132,30 @@
 
     a {
       color: inherit;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 10px 14px;
+      border-radius: 6px;
+      background: var(--text);
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      transform: translateY(-160%);
+      transition: transform 0.2s ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
     }
 
     .site-header {
@@ -207,15 +243,6 @@
       user-select: none;
     }
 
-    /* Anti-flicker: applies only to Chinese visitors before the main script
-       runs. The boot script sets html[data-lang="zh"] before first paint, so
-       translated nodes stay hidden until the main script swaps their text and
-       adds .i18n-ready. No-JS and English visitors never match this rule, so
-       the canonical English content renders immediately. */
-    html[data-lang="zh"]:not(.i18n-ready) [data-i18n] {
-      visibility: hidden;
-    }
-
     main {
       max-width: var(--max);
       margin: 0 auto;
@@ -225,6 +252,10 @@
     section {
       border-top: 1px solid var(--line);
       padding: 72px 0;
+    }
+
+    section[id] {
+      scroll-margin-top: 104px;
     }
 
     .hero {
@@ -417,6 +448,17 @@
       line-height: 1.35;
     }
 
+    .title-link {
+      text-decoration-color: transparent;
+      text-underline-offset: 4px;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+
+    .title-link:hover {
+      color: var(--accent);
+      text-decoration-color: currentColor;
+    }
+
     .meta {
       color: var(--soft);
       font-size: 13px;
@@ -542,6 +584,43 @@
       font-size: 13px;
     }
 
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 24px;
+    }
+
+    .footer-inner p {
+      margin: 0;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+    }
+
+    .footer-links a {
+      text-underline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
     @media (max-width: 860px) {
       .nav {
         align-items: flex-start;
@@ -559,6 +638,10 @@
         width: 100%;
         overflow-x: auto;
         padding-bottom: 4px;
+      }
+
+      section[id] {
+        scroll-margin-top: 180px;
       }
 
       .hero,
@@ -615,23 +698,8 @@
     }
   </style>
 </head>
-<body>
-  <!-- i18n boot script: runs before first paint and stands alone (does not
-       depend on the main script at the end of <body>). It reads the saved
-       language and sets <html lang> + data-lang so screen readers and the
-       anti-flicker CSS see the chosen language before content is drawn.
-       Default is always English; navigator.language is intentionally ignored. -->
-  <script>
-    (function () {
-      var lang = "en";
-      try {
-        if (localStorage.getItem("kx-site-lang") === "zh") lang = "zh";
-      } catch (e) {}
-      var html = document.documentElement;
-      html.setAttribute("data-lang", lang);
-      html.lang = lang === "zh" ? "zh-Hans" : "en-CA";
-    })();
-  </script>
+<body id="top">
+  <a class="skip-link" href="#main-content" data-i18n="skipLink">Skip to main content</a>
 
   <header class="site-header">
     <nav class="nav" aria-label="Primary navigation" data-i18n-attr="aria-label:nav.aria">
@@ -655,11 +723,11 @@
     </nav>
   </header>
 
-  <main id="top">
+  <main id="main-content" tabindex="-1">
     <section class="hero" aria-labelledby="intro-title">
       <div>
         <p class="eyebrow" data-i18n="hero.eyebrow">Open to Summer 2027 internships</p>
-        <h1 id="intro-title" data-i18n="hero.title">Statistics and Economics student focused on applied data work.</h1>
+        <h1 id="intro-title" data-i18n="hero.title">Kexing Yan (严可行)</h1>
         <p class="hero-summary" data-i18n="hero.summary">
           I am Kexing Yan (严可行), an Honours BSc student at the University of Toronto, St. George Campus, double-majoring in Economics and Statistics with a focus on Data Analytics. My interests include econometrics, applied data analysis, financial research, and clear, evidence-based research questions.
         </p>
@@ -762,8 +830,8 @@
           <article class="item">
             <div class="item-head">
               <div>
-                <h3 data-i18n="research.paperTitle">The Quantity and Size of Microloans Follow Different Development Logics: Evidence from Kiva</h3>
-                <p data-i18n="research.paperType">Research paper</p>
+                <h3><a class="title-link" href="/research/microloan-quantity-size/" data-i18n="research.paperTitle">The Quantity and Size of Microloans Follow Different Development Logics: Evidence from Kiva</a></h3>
+                <p data-i18n="research.paperType">Student working paper</p>
               </div>
               <span class="meta" data-i18n="research.date">July 2026</span>
             </div>
@@ -771,7 +839,7 @@
               This paper studies how Kiva microfinance activity relates to economic development across an 84-country panel from 2013 to 2017, separating total lending volume, individual loan size, and whether Kiva operates in a country at all.
             </p>
             <p data-i18n="research.abstract2">
-              Loan size follows a significant U-shaped relationship with development level, while total lending volume shows no significant inverted-U — the two dimensions of microfinance activity are driven by different mechanisms. Kiva's country entry pattern is more nuanced than a simple middle-income peak.
+              Loan size follows a significant U-shaped relationship with development level, while total lending volume shows no significant inverted-U. Kiva's country entry pattern is more nuanced than a simple middle-income peak, so the paper treats the three margins as distinct outcomes.
             </p>
             <div class="tags">
               <span class="tag">Python</span>
@@ -782,6 +850,7 @@
               <span class="tag" data-i18n="research.tagEconometrics">Econometrics</span>
             </div>
             <div class="item-actions">
+              <a class="paper-link" href="/research/microloan-quantity-size/" data-i18n="research.readSummary">Read research summary</a>
               <a class="paper-link" href="papers/the-quantity-and-size-of-microloans.pdf" target="_blank" rel="noreferrer" data-i18n="research.readPaper">Read paper PDF</a>
               <a class="paper-link" href="https://github.com/KexingYan/kiva-microfinance-development" target="_blank" rel="noreferrer" data-i18n="research.viewCode">View code</a>
             </div>
@@ -856,8 +925,20 @@
     </section>
   </main>
 
-  <footer data-i18n="footer.text">
-    © 2026 Kexing Yan. University of Toronto · Economics &amp; Statistics.
+  <footer>
+    <div class="footer-inner">
+      <p data-i18n="footer.text">© 2026 Kexing Yan. University of Toronto · Economics &amp; Statistics.</p>
+      <nav class="footer-links" aria-label="Footer navigation" data-i18n-attr="aria-label:footer.aria">
+        <a href="#main-content" data-i18n="footer.home">Home</a>
+        <a href="#about" data-i18n="footer.about">About Kexing Yan</a>
+        <a href="/research/microloan-quantity-size/" data-i18n="footer.research">Research paper</a>
+        <a href="#contact" data-i18n="footer.contact">Contact</a>
+      </nav>
+      <p>
+        <span data-i18n="footer.updatedLabel">Last updated</span>
+        <time datetime="2026-07-31" data-i18n="footer.updatedDate">31 July 2026</time>
+      </p>
+    </div>
   </footer>
 
   <script>
@@ -881,9 +962,10 @@
           "nav.contact": "联系",
           "nav.aria": "主导航",
           "langToggle.aria": "语言",
+          "skipLink": "跳到主要内容",
           // Hero
           "hero.eyebrow": "期待 2027 年暑期实习机会",
-          "hero.title": "主修统计与经济，志在应用数据分析。",
+          "hero.title": "严可行（Kexing Yan）",
           "hero.summary": "我是严可行（Kexing Yan），University of Toronto 圣乔治校区经济学与统计学双主修在读，攻读理学荣誉学士学位，方向为数据分析。研究兴趣涵盖计量经济学、应用数据分析和金融研究，尤重基于证据的清晰问题意识。",
           "hero.viewResearch": "查看研究成果",
           "hero.emailMe": "邮件联系",
@@ -921,11 +1003,12 @@
           "research.kicker": "03 · 研究",
           "research.title": "研究论文选。",
           "research.paperTitle": "《小额信贷之数量与规模，各循其发展逻辑——来自 Kiva 的实证》",
-          "research.paperType": "研究论文",
+          "research.paperType": "学生工作论文",
           "research.date": "2026 年 7 月",
           "research.abstract1": "本文利用 2013—2017 年覆盖 84 国的面板数据，考察 Kiva 小额信贷活动与经济发展的关系，并区分总放贷量、单笔贷款规模与 Kiva 是否进入某国这三个维度。",
-          "research.abstract2": "单笔贷款规模与发展水平呈显著 U 型关系，总放贷量则无显著的倒 U 型特征——二者由不同的机制驱动。Kiva 进入各国的模式，远非‘中等收入峰值’所能概括。",
+          "research.abstract2": "单笔贷款规模与发展水平呈显著 U 型关系，总放贷量则无显著的倒 U 型特征。Kiva 进入各国的模式也并非简单的“中等收入峰值”，因此论文将三个维度作为不同结果分别分析。",
           "research.tagEconometrics": "计量经济学",
+          "research.readSummary": "阅读研究摘要",
           "research.readPaper": "阅读论文（PDF）",
           "research.viewCode": "查看代码",
           // Experience
@@ -946,7 +1029,14 @@
           "contact.resumeLabel": "简历",
           "contact.resumeValue": "下载 PDF",
           // Footer
-          "footer.text": "© 2026 Kexing Yan · University of Toronto · 经济学与统计学"
+          "footer.text": "© 2026 Kexing Yan · University of Toronto · 经济学与统计学",
+          "footer.aria": "页脚导航",
+          "footer.home": "首页",
+          "footer.about": "关于严可行",
+          "footer.research": "研究论文",
+          "footer.contact": "联系",
+          "footer.updatedLabel": "最后更新",
+          "footer.updatedDate": "2026 年 7 月 31 日"
         }
       };
 
@@ -1018,13 +1108,7 @@
       var initial = "en";
       try { if (localStorage.getItem(STORAGE_KEY) === "zh") initial = "zh"; } catch (e) {}
 
-      try {
-        apply(initial);
-      } finally {
-        // Reveal content even if apply threw, so the anti-flicker CSS never
-        // leaves Chinese visitors with permanently hidden text.
-        html.classList.add("i18n-ready");
-      }
+      apply(initial);
 
       if (btnEn) btnEn.addEventListener("click", function () { setLang("en"); });
       if (btnZh) btnZh.addEventListener("click", function () { setLang("zh"); });
@@ -1044,7 +1128,13 @@
       });
 
       links.forEach((link) => {
-        link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+        const isActive = link.getAttribute("href") === `#${current}`;
+        link.classList.toggle("active", isActive);
+        if (isActive) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
       });
     }
 

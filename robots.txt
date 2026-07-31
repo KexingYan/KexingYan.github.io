@@ -1,3 +1,42 @@
+# Search engines and AI search/citation crawlers.
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Model-training controls. OpenAI and Anthropic expose separate search agents,
+# so their training crawlers are blocked without blocking search/citation.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+# Google currently combines specified Gemini training and grounding controls
+# under Google-Extended. It is allowed deliberately for Gemini grounding.
+User-agent: Google-Extended
+Allow: /
+
+# All other standards-compliant crawlers may access the public site.
 User-agent: *
 Allow: /
 
