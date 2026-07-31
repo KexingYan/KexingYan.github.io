@@ -1,0 +1,50 @@
+name: Validate static site
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build explicit deployment artifact
+        run: python3 scripts/build_site.py
+
+      - name: Validate source and deployment artifact
+        run: |
+          python3 scripts/validate_site.py
+          python3 scripts/validate_site.py --root dist
+
+      - name: Run unit tests
+        run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+
+      - name: Compile Python validation tools
+        run: |
+          python3 -m py_compile \
+            scripts/build_site.py \
+            scripts/validate_site.py \
+            scripts/test_build_site.py \
+            scripts/test_validate_site.py \
+            scripts/verify_production.py \
+            scripts/test_verify_production.py
+
+      - name: Parse packaged sitemap
+        run: python3 -c "from xml.etree import ElementTree; ElementTree.parse('dist/sitemap.xml')"
+
+      - name: Check patch whitespace
+        run: git diff --check

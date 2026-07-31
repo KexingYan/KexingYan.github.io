@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "copyrightYear": 2026,
+  "pages": {
+    "/": {
+      "dateModified": "2026-07-31",
+      "sitemapLastmod": "2026-07-31",
+      "reason": "Meaningful profile, accessibility, metadata, and internal-link revisions through Phase 15."
+    },
+    "/research/microloan-quantity-size/": {
+      "dateModified": "2026-07-31",
+      "sitemapLastmod": "2026-07-31",
+      "work": "microloan-quantity-size",
+      "reason": "Initial canonical HTML research page plus metadata and accessibility review."
+    }
+  },
+  "works": {
+    "microloan-quantity-size": {
+      "dateCreated": "2026-07-09",
+      "citationDate": "2026-07-09",
+      "visibleLabel": "Completed",
+      "source": "Visible manuscript title page; this is not asserted as the website publication date."
+    }
+  },
+  "files": {
+    "/papers/the-quantity-and-size-of-microloans.pdf": {
+      "contentDate": "2026-07-09",
+      "metadataModified": "2026-07-31",
+      "sitemapLastmod": "2026-07-31",
+      "reason": "Verified descriptive metadata and document language were added without changing rendered content."
+    }
+  }
+}
