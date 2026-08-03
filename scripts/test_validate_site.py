@@ -21,6 +21,7 @@ class ValidatorTests(unittest.TestCase):
         extra_body: str = "",
         extra_graph: str = "",
         lastmod: str = "2026-07-31",
+        profile_modified: object = "2026-07-31T16:32:46+08:00",
         redirects: str | None = None,
     ) -> Path:
         temporary = tempfile.TemporaryDirectory()
@@ -64,7 +65,7 @@ class ValidatorTests(unittest.TestCase):
         "@type": "ProfilePage",
         "@id": "{DOMAIN}/#profile",
         "url": "{DOMAIN}/",
-        "dateModified": "2026-07-31",
+        "dateModified": {json.dumps(profile_modified)},
         "mainEntity": {{"@id": "{PERSON_ID}"}}
       }},
       {{
@@ -157,6 +158,7 @@ Sitemap: {DOMAIN}/sitemap.xml
                 "pages": {
                     "/": {
                         "dateModified": "2026-07-31",
+                        "structuredDataDateModified": profile_modified,
                         "sitemapLastmod": lastmod,
                     }
                 },
@@ -243,6 +245,48 @@ Sitemap: {DOMAIN}/sitemap.xml
         data["pages"]["/"]["dateModified"] = "2026-07-30"
         source.write_text(json.dumps(data), encoding="utf-8")
         self.assert_fails_with(root, "visible updated date does not match")
+
+    def test_profile_datetime_accepts_offset_and_z(self) -> None:
+        for value in (
+            "2026-07-31T16:32:46+08:00",
+            "2026-07-31T08:32:46Z",
+        ):
+            with self.subTest(value=value):
+                errors, _ = validate(self.make_site(profile_modified=value))
+                self.assertEqual(errors, [])
+
+    def test_invalid_profile_datetimes_are_rejected(self) -> None:
+        for value in (
+            "2026-07-31",
+            "2026/07/31",
+            "31-07-2026",
+            "2026-07-31T16:32:46",
+            "2026-02-30T12:00:00+08:00",
+            "invalid",
+        ):
+            with self.subTest(value=value):
+                self.assert_fails_with(
+                    self.make_site(profile_modified=value),
+                    "full ISO 8601 DateTime with seconds and timezone",
+                )
+
+    def test_profile_datetime_must_be_a_string(self) -> None:
+        self.assert_fails_with(
+            self.make_site(profile_modified=20260731),
+            "ProfilePage.dateModified must be a string",
+        )
+
+    def test_future_profile_datetime_is_rejected(self) -> None:
+        self.assert_fails_with(
+            self.make_site(profile_modified="2999-07-31T16:32:46+08:00"),
+            "ProfilePage.dateModified must not be in the future",
+        )
+
+    def test_profile_datetime_calendar_date_must_match_page_date(self) -> None:
+        self.assert_fails_with(
+            self.make_site(profile_modified="2026-07-30T16:32:46+08:00"),
+            "datetime calendar date differs from page modification date",
+        )
 
     def test_broken_llms_reference_is_rejected(self) -> None:
         root = self.make_site()

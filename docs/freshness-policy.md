@@ -10,6 +10,8 @@
    cannot establish a live publication date.
 2. `dateModified` represents a meaningful page-content or metadata revision,
    not a deployment, formatting-only edit, analytics change, or build time.
+   The homepage ProfilePage uses a full, timezone-aware DateTime from the
+   accepted content commit; visible dates and sitemap dates remain date-only.
 3. Sitemap `lastmod` is manually governed and validated against this file; it is
    never generated from filesystem timestamps.
 4. The manuscript date is represented as `dateCreated` and visibly labelled
@@ -24,7 +26,7 @@
 | Surface | Value | Meaning | Verification / maintenance |
 |---|---:|---|---|
 | Homepage visible update | 2026-07-31 | Meaningful profile, metadata, accessibility, and link revisions | Manual source plus validator |
-| Homepage `ProfilePage.dateModified` | 2026-07-31 | Same homepage revision | Validator-enforced |
+| Homepage `ProfilePage.dateModified` | 2026-07-31T16:32:46+08:00 | Same homepage revision; timestamp from accepted content commit `a38c23d` | Validator-enforced |
 | Homepage sitemap `lastmod` | 2026-07-31 | Same meaningful revision | Validator-enforced |
 | Research visible page update | 2026-07-31 | Canonical HTML page and metadata review | Manual source plus validator |
 | Research `WebPage.dateModified` | 2026-07-31 | Same HTML-page revision | Validator-enforced |
@@ -44,8 +46,10 @@ For a meaningful update:
 
 1. Edit the visible page and matching metadata.
 2. Update only that route in `scripts/site_dates.json` and explain the reason.
-3. Update the visible `<time>`, matching page-level JSON-LD `dateModified`, and
-   sitemap `lastmod` to the same date.
+3. Update the visible `<time>` and sitemap `lastmod` to the governed date. For
+   the homepage, record the matching full ProfilePage DateTime separately as
+   `structuredDataDateModified`; its calendar date must agree with the visible
+   and sitemap date.
 4. For a paper revision, verify the new title-page/revision date before changing
    `dateCreated`, citation fields, or PDF dates.
 5. Run `python3 scripts/validate_site.py`.

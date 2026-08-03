@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import struct
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -30,6 +31,9 @@ VERIFICATION_HTML = {"baidu_verify_codeva-vWXLKxDtXl.html"}
 PERSON_ID = f"{DOMAIN}/#person"
 WEBSITE_ID = f"{DOMAIN}/#website"
 PROFILE_ID = f"{DOMAIN}/#profile"
+PROFILE_DATETIME_PATTERN = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$"
+)
 
 
 @dataclass
@@ -190,6 +194,19 @@ def valid_canonical(url: str, domain: str) -> bool:
         and not parsed.fragment
         and bool(parsed.path)
     )
+
+
+def parse_profile_datetime(value: object) -> datetime | None:
+    """Parse the full timezone-aware DateTime Google requires for ProfilePage."""
+    if not isinstance(value, str) or not PROFILE_DATETIME_PATTERN.fullmatch(value):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed
 
 
 def png_dimensions(path: Path) -> tuple[int, int] | None:
@@ -778,9 +795,24 @@ def validate(
     if len(profile_nodes) != 1:
         errors.append("JSON-LD must define the ProfilePage exactly once")
     else:
-        main_entity = profile_nodes[0][1].get("mainEntity")
+        profile = profile_nodes[0][1]
+        main_entity = profile.get("mainEntity")
         if main_entity != {"@id": PERSON_ID}:
             errors.append("ProfilePage.mainEntity must reference canonical Person")
+        modified = profile.get("dateModified")
+        if not isinstance(modified, str):
+            errors.append("ProfilePage.dateModified must be a string")
+        else:
+            parsed_modified = parse_profile_datetime(modified)
+            if parsed_modified is None:
+                errors.append(
+                    "ProfilePage.dateModified must be a full ISO 8601 DateTime "
+                    "with seconds and timezone"
+                )
+            elif parsed_modified.astimezone(timezone.utc) > (
+                datetime.now(timezone.utc) + timedelta(minutes=5)
+            ):
+                errors.append("ProfilePage.dateModified must not be in the future")
 
     not_found = pages.get((root / "404.html").resolve())
     if not_found is None:
@@ -980,7 +1012,29 @@ def validate(
                     )
                 node_id = PROFILE_ID if route == "/" else f"{domain}{route}#webpage"
                 nodes = definitions.get(node_id, [])
-                if len(nodes) != 1 or nodes[0][1].get("dateModified") != modified:
+                expected_structured_modified: object = modified
+                if route == "/":
+                    expected_structured_modified = record.get(
+                        "structuredDataDateModified"
+                    )
+                    parsed_structured_modified = parse_profile_datetime(
+                        expected_structured_modified
+                    )
+                    if parsed_structured_modified is None:
+                        errors.append(
+                            "date source /: invalid ProfilePage "
+                            "structuredDataDateModified"
+                        )
+                    elif parsed_structured_modified.date().isoformat() != modified:
+                        errors.append(
+                            "date source /: ProfilePage datetime calendar date "
+                            "differs from page modification date"
+                        )
+                if (
+                    len(nodes) != 1
+                    or nodes[0][1].get("dateModified")
+                    != expected_structured_modified
+                ):
                     errors.append(
                         f"{route}: JSON-LD dateModified does not match date source"
                     )

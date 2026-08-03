@@ -4,6 +4,7 @@
   "pages": {
     "/": {
       "dateModified": "2026-07-31",
+      "structuredDataDateModified": "2026-07-31T16:32:46+08:00",
       "sitemapLastmod": "2026-07-31",
       "reason": "Meaningful profile, accessibility, metadata, and internal-link revisions through Phase 15."
     },
