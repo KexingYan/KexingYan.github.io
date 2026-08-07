@@ -4,3 +4,8 @@
 # files themselves will not appear in search results.
 /assets/resume/*
   X-Robots-Tag: noindex
+
+# Offline owner prototype. Cloudflare Access must be attached before any future
+# production exposure, and the application API must validate Access JWTs.
+/studio/*
+  X-Robots-Tag: noindex, nofollow

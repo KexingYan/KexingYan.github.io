@@ -269,6 +269,8 @@ def validate_production_mode() -> None:
             fail("Production release contains local generated Photography assets")
         if (release / "data").exists():
             fail("Production release contains authoritative seed data")
+        if (release / "studio").exists() or (release / "assets" / "studio").exists():
+            fail("Production release contains the offline-only Studio prototype")
         config_text = (release / "assets" / "photography" / "config.js").read_text(encoding="utf-8")
         if manifest_url not in config_text or '"mode": "production"' not in config_text:
             fail("Production release config does not select the R2 manifest")
@@ -416,6 +418,39 @@ def validate_cloudflare_foundation() -> None:
         fail(f"Generated Photography JPEGs are staged for Git: {staged_generated}")
 
 
+def validate_studio_isolation() -> None:
+    studio_files = [
+        ROOT / "studio" / "index.html",
+        ROOT / "studio" / "preview.html",
+        ROOT / "studio" / "tests.html",
+    ]
+    for path in studio_files:
+        text = path.read_text(encoding="utf-8")
+        if 'name="robots" content="noindex, nofollow, noarchive"' not in text:
+            fail(f"Studio route lacks strict noindex metadata: {path.relative_to(ROOT)}")
+        if 'type="password"' in text.lower():
+            fail(f"Studio contains a fake password field: {path.relative_to(ROOT)}")
+    headers = (ROOT / "_headers").read_text(encoding="utf-8")
+    if "/studio/*" not in headers or "X-Robots-Tag: noindex, nofollow" not in headers:
+        fail("Studio lacks an X-Robots-Tag noindex header rule")
+
+    public_entrypoints = [ROOT / "index.html", ROOT / "photography" / "index.html", ROOT / "sitemap.xml"]
+    for path in public_entrypoints:
+        if "/studio" in path.read_text(encoding="utf-8"):
+            fail(f"Studio is exposed from public navigation/sitemap: {path.relative_to(ROOT)}")
+
+    repository_text = (ROOT / "assets" / "studio" / "photo-admin-repository.js").read_text(encoding="utf-8")
+    for method in (
+        "listPhotos", "getPhoto", "saveDraft", "publishPhoto", "archivePhoto",
+        "reorderPhotos", "listSeries", "updateSeries", "prepareUpload",
+        "exportPublicManifest", "exportPreviewManifest",
+    ):
+        if f"{method}(" not in repository_text:
+            fail(f"Local PhotoAdminRepository is missing {method}()")
+    if 'fetch("/api/photo-admin/' in repository_text or "fetch('/api/photo-admin/" in repository_text:
+        fail("Offline Studio repository attempts to call the future production admin API")
+
+
 def main() -> int:
     validate_html()
     validate_seed_and_local_manifest()
@@ -423,6 +458,7 @@ def main() -> int:
     validate_no_private_leaks()
     validate_sitemap()
     validate_cloudflare_foundation()
+    validate_studio_isolation()
     if ERRORS:
         print(f"FAILED: {len(ERRORS)} issue(s)")
         for error in ERRORS:
@@ -432,13 +468,14 @@ def main() -> int:
     print("PASS: 14 unique records, asset versions, and four approved series")
     print("PASS: local manifest regenerates deterministically and resolves 56 versioned derivatives")
     print("PASS: production manifest emits configured HTTPS R2 URLs")
-    print("PASS: production release excludes local JPEGs and authoritative seed data")
+    print("PASS: production release excludes local JPEGs, authoritative seed data, and offline Studio")
     print("PASS: download targets are 1800px derivatives only")
     print("PASS: creator metadata and GPS stripping")
     print("PASS: no source paths, master keys, filenames, hashes, or private fields in public output")
     print("PASS: Wrangler resource template contains deterministic names and no account secrets")
     print("PASS: D1 schema and guarded initial seed apply locally; second seed is rejected")
     print("PASS: no generated Photography JPEG is staged for Git")
+    print("PASS: Studio routes are noindex, publicly unlinked, and use an offline repository adapter")
     return 0
 
 

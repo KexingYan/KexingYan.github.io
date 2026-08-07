@@ -1,6 +1,10 @@
 .DS_Store
 *.private.json
+*.provenance.json
+*source-hashes*.json
 private/
+production-private/
+data/photography/private*.json
 __pycache__/
 *.pyc
 dist/
@@ -11,3 +15,4 @@ dist/
 assets/photography/generated/
 *photography-r2-plan*.json
 cloudflare/photography/wrangler.resolved.jsonc
+.local/

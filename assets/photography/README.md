@@ -49,3 +49,7 @@ Never publish the private provenance file: it contains source paths, hashes, and
 private R2 master keys. Do not commit generated JPEGs. See
 `docs/photography-cloudflare.md` for the two-bucket production design and staged
 migration procedure.
+
+New masters use `scripts/ingest_photography.py`. It defaults to a no-write dry-run
+or requires explicit `--confirm-write`, creates ignored local draft packages, and
+never updates public data automatically. See `docs/photography-studio.md`.
