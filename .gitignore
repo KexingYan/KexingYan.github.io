@@ -1,1 +1,13 @@
 .DS_Store
+*.private.json
+private/
+__pycache__/
+*.pyc
+dist/
+.wrangler/
+.dev.vars*
+.env*
+!.env.example
+assets/photography/generated/
+*photography-r2-plan*.json
+cloudflare/photography/wrangler.resolved.jsonc

@@ -504,6 +504,72 @@
       gap: 14px;
     }
 
+    .photo-feature-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+      gap: clamp(36px, 6vw, 72px);
+      align-items: center;
+    }
+
+    .photo-feature-image {
+      display: block;
+      overflow: hidden;
+      background: #e8e5dc;
+    }
+
+    .photo-feature-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transition: filter 0.35s ease, transform 0.5s ease;
+    }
+
+    .photo-feature-image:hover img {
+      filter: brightness(1.025);
+      transform: scale(1.01);
+    }
+
+    .photo-feature-label {
+      margin: 0 0 18px;
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .photo-feature-copy h2 {
+      max-width: 430px;
+      margin-bottom: 22px;
+      font-size: clamp(32px, 4.2vw, 50px);
+    }
+
+    .photo-feature-copy > p:not(.photo-feature-label) {
+      max-width: 390px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .photo-feature-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .photo-feature-link span {
+      transition: transform 0.2s ease;
+    }
+
+    .photo-feature-link:hover span {
+      transform: translateX(4px);
+    }
+
     .contact-link {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -562,7 +628,8 @@
       }
 
       .hero,
-      .section-grid {
+      .section-grid,
+      .photo-feature-grid {
         grid-template-columns: 1fr;
         gap: 36px;
       }
@@ -607,6 +674,10 @@
         display: block;
       }
 
+      .photo-feature-copy h2 {
+        font-size: 34px;
+      }
+
       .meta {
         display: block;
         margin-top: 6px;
@@ -642,6 +713,7 @@
           <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
           <li><a href="#research" data-i18n="nav.research">Research</a></li>
           <li><a href="#experience" data-i18n="nav.experience">Honours</a></li>
+          <li><a href="#photography" data-i18n="nav.photography">Photography</a></li>
           <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
         </ul>
         <!-- Language toggle. EN / 中文 are language endonyms, shown untranslated
@@ -824,10 +896,35 @@
       </div>
     </section>
 
+    <section id="photography" aria-labelledby="photography-feature-title">
+      <div class="photo-feature-grid">
+        <a class="photo-feature-image" href="/photography/" aria-label="Explore the Photography visual journal">
+          <img
+            src="/assets/photography/generated/preview/P011-v1-preview.jpg"
+            srcset="/assets/photography/generated/preview/P011-v1-preview.jpg 960w, /assets/photography/generated/display/P011-v1-display.jpg 1650w"
+            sizes="(max-width: 860px) 100vw, 56vw"
+            width="960"
+            height="1280"
+            loading="lazy"
+            decoding="async"
+            alt="A sunlit neighborhood street seen through a dark curved concrete arch." />
+        </a>
+        <div class="photo-feature-copy">
+          <p class="photo-feature-label" data-i18n="photography.kicker">05 Photography · Visual Journal</p>
+          <h2 id="photography-feature-title" data-i18n="photography.title">Cities, accidental light, old architecture and quiet things.</h2>
+          <p data-i18n="photography.copy">Photography is another way I observe places: without a fixed route, and attentive to what usually passes unnoticed.</p>
+          <a class="photo-feature-link" href="/photography/">
+            <span data-i18n="photography.link">Explore the archive</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <section id="contact" aria-labelledby="contact-title">
       <div class="section-grid">
         <div>
-          <p class="section-kicker" data-i18n="contact.kicker">05 Contact</p>
+          <p class="section-kicker" data-i18n="contact.kicker">06 Contact</p>
           <h2 id="contact-title" data-i18n="contact.title">Let's connect.</h2>
         </div>
         <div class="contact-block">
@@ -878,6 +975,7 @@
           "nav.skills": "技能",
           "nav.research": "研究",
           "nav.experience": "荣誉与经历",
+          "nav.photography": "摄影",
           "nav.contact": "联系",
           "nav.aria": "主导航",
           "langToggle.aria": "语言",
@@ -938,8 +1036,13 @@
           "experience.item2Type": "学术荣誉",
           "experience.item2Meta": "University of Toronto · 圣乔治校区",
           "experience.item2Desc": "基于学术优异表现，于录取时授予之择优奖学金。",
+          // Photography
+          "photography.kicker": "05 · 摄影 · 视觉札记",
+          "photography.title": "城市、偶然的光、旧建筑与静默之物。",
+          "photography.copy": "摄影是我观察地点的另一种方式：没有固定路线，也留意那些通常被忽略的瞬间。",
+          "photography.link": "浏览影像档案",
           // Contact
-          "contact.kicker": "05 · 联系",
+          "contact.kicker": "06 · 联系",
           "contact.title": "保持联系",
           "contact.personalEmailLabel": "个人邮箱",
           "contact.universityEmailLabel": "校园邮箱",

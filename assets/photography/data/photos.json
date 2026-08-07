@@ -1,0 +1,734 @@
+{
+  "schemaVersion": 1,
+  "publishRevision": "seed-2026-08-07-v1",
+  "assetMode": "local",
+  "assetBase": "/assets/photography/generated",
+  "series": [
+    {
+      "id": "city-drifting",
+      "number": "01",
+      "title": "City Drifting",
+      "description": "Dense streets, layered facades, narrow passages and accidental viewpoints found while moving through the city."
+    },
+    {
+      "id": "accidental-colour",
+      "number": "02",
+      "title": "Accidental Colour",
+      "description": "Moments when ordinary spaces become graphic through colour, sunlight and unexpected combinations."
+    },
+    {
+      "id": "quiet-objects",
+      "number": "03",
+      "title": "Quiet Objects",
+      "description": "Stone figures, architectural fragments and objects that seem to wait quietly inside their surroundings."
+    },
+    {
+      "id": "garden-notes",
+      "number": "04",
+      "title": "Garden Notes",
+      "description": "Leaves, old structures, shadows, water and small compositions discovered in gardens."
+    }
+  ],
+  "photos": [
+    {
+      "id": "P001",
+      "slug": "lions-in-morning-light",
+      "title": "Lions in Morning Light",
+      "seriesId": "quiet-objects",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Two weathered stone lions standing in sunlit grass beside a garden path.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "65 mm",
+      "aperture": "f/4.5",
+      "shutterSpeed": "1/100 s",
+      "iso": 100,
+      "orientation": "portrait",
+      "layoutHint": "portrait-right",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 4,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P001-v1-thumbnail.jpg",
+          "width": 320,
+          "height": 480,
+          "bytes": 71150
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P001-v1-preview.jpg",
+          "width": 853,
+          "height": 1280,
+          "bytes": 512381
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P001-v1-display.jpg",
+          "width": 1467,
+          "height": 2200,
+          "bytes": 1422030
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P001-v1-download.jpg",
+          "width": 1200,
+          "height": 1800,
+          "bytes": 1019806
+        }
+      }
+    },
+    {
+      "id": "P002",
+      "slug": "bamboo-screen",
+      "title": "Bamboo Screen",
+      "seriesId": "garden-notes",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Slender bamboo leaves catching sunlight against softly blurred garden architecture.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "91 mm",
+      "aperture": "f/5.6",
+      "shutterSpeed": "1/125 s",
+      "iso": 100,
+      "orientation": "portrait",
+      "layoutHint": "portrait-right",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 3,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P002-v1-thumbnail.jpg",
+          "width": 320,
+          "height": 480,
+          "bytes": 45214
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P002-v1-preview.jpg",
+          "width": 853,
+          "height": 1280,
+          "bytes": 208765
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P002-v1-display.jpg",
+          "width": 1467,
+          "height": 2200,
+          "bytes": 548698
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P002-v1-download.jpg",
+          "width": 1200,
+          "height": 1800,
+          "bytes": 396678
+        }
+      }
+    },
+    {
+      "id": "P003",
+      "slug": "through-the-foliage",
+      "title": "Through the Foliage",
+      "seriesId": "garden-notes",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Traditional painted eaves partially hidden behind layers of green foliage.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "91 mm",
+      "aperture": "f/5.6",
+      "shutterSpeed": "1/125 s",
+      "iso": 100,
+      "orientation": "portrait",
+      "layoutHint": "portrait-left",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 1,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P003-v1-thumbnail.jpg",
+          "width": 320,
+          "height": 480,
+          "bytes": 70087
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P003-v1-preview.jpg",
+          "width": 853,
+          "height": 1280,
+          "bytes": 433004
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P003-v1-display.jpg",
+          "width": 1467,
+          "height": 2200,
+          "bytes": 1159976
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P003-v1-download.jpg",
+          "width": 1200,
+          "height": 1800,
+          "bytes": 844442
+        }
+      }
+    },
+    {
+      "id": "P004",
+      "slug": "garden-crossing",
+      "title": "Garden Crossing",
+      "seriesId": "garden-notes",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "A small arched bridge crossing bright green water in a carefully planted garden.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "24 mm",
+      "aperture": "f/6.3",
+      "shutterSpeed": "1/100 s",
+      "iso": 100,
+      "orientation": "landscape",
+      "layoutHint": "wide",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 2,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P004-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 77697
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P004-v1-preview.jpg",
+          "width": 1280,
+          "height": 853,
+          "bytes": 628733
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P004-v1-display.jpg",
+          "width": 2200,
+          "height": 1467,
+          "bytes": 2089423
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P004-v1-download.jpg",
+          "width": 1800,
+          "height": 1200,
+          "bytes": 1399164
+        }
+      }
+    },
+    {
+      "id": "P005",
+      "slug": "stone-steps",
+      "title": "Stone Steps",
+      "seriesId": "quiet-objects",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Stone posts and carved figures lining shaded garden steps.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "36 mm",
+      "aperture": "f/5",
+      "shutterSpeed": "1/80 s",
+      "iso": 100,
+      "orientation": "landscape",
+      "layoutHint": "pair-left",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 2,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P005-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 68016
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P005-v1-preview.jpg",
+          "width": 1280,
+          "height": 853,
+          "bytes": 448801
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P005-v1-display.jpg",
+          "width": 2200,
+          "height": 1467,
+          "bytes": 1257954
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P005-v1-download.jpg",
+          "width": 1800,
+          "height": 1200,
+          "bytes": 895998
+        }
+      }
+    },
+    {
+      "id": "P006",
+      "slug": "figures-in-the-garden",
+      "title": "Figures in the Garden",
+      "seriesId": "quiet-objects",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Two stone figures standing quietly at the edge of a shaded garden.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "81 mm",
+      "aperture": "f/6.3",
+      "shutterSpeed": "1/400 s",
+      "iso": 100,
+      "orientation": "landscape",
+      "layoutHint": "pair-right",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 3,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P006-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 61322
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P006-v1-preview.jpg",
+          "width": 1280,
+          "height": 853,
+          "bytes": 403452
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P006-v1-display.jpg",
+          "width": 2200,
+          "height": 1467,
+          "bytes": 1205407
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P006-v1-download.jpg",
+          "width": 1800,
+          "height": 1200,
+          "bytes": 831965
+        }
+      }
+    },
+    {
+      "id": "P007",
+      "slug": "pine-and-passing-cloud",
+      "title": "Pine and Passing Cloud",
+      "seriesId": "garden-notes",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "A dark pine branch reaching into a deep blue sky beside a single white cloud.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "28 mm",
+      "aperture": "f/10",
+      "shutterSpeed": "1/250 s",
+      "iso": 100,
+      "orientation": "landscape",
+      "layoutHint": "wide",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 4,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P007-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 35226
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P007-v1-preview.jpg",
+          "width": 1280,
+          "height": 853,
+          "bytes": 210283
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P007-v1-display.jpg",
+          "width": 2200,
+          "height": 1467,
+          "bytes": 640828
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P007-v1-download.jpg",
+          "width": 1800,
+          "height": 1200,
+          "bytes": 441480
+        }
+      }
+    },
+    {
+      "id": "P008",
+      "slug": "lion-in-the-round",
+      "title": "Lion in the Round",
+      "seriesId": "quiet-objects",
+      "dateTaken": "2026-07-28",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "A small stone lion framed by a circular opening in a garden wall.",
+      "camera": "Sony α7 IV",
+      "lens": "FE 24-105mm F4 G OSS",
+      "focalLength": "63 mm",
+      "aperture": "f/6.3",
+      "shutterSpeed": "1/125 s",
+      "iso": 100,
+      "orientation": "landscape",
+      "layoutHint": "wide",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 1,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P008-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 320,
+          "bytes": 59537
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P008-v1-preview.jpg",
+          "width": 1280,
+          "height": 853,
+          "bytes": 449969
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P008-v1-display.jpg",
+          "width": 2200,
+          "height": 1467,
+          "bytes": 1447989
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P008-v1-download.jpg",
+          "width": 1800,
+          "height": 1200,
+          "bytes": 980323
+        }
+      }
+    },
+    {
+      "id": "P009",
+      "slug": "street-layers",
+      "title": "Street Layers",
+      "seriesId": "city-drifting",
+      "dateTaken": "2026-08-06",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "A residential street descending between layered apartment facades and overhead cables.",
+      "camera": "iPhone 15 Plus",
+      "lens": "iPhone 15 Plus back dual wide camera 5.96mm f/1.6",
+      "focalLength": "5.96 mm",
+      "aperture": "f/1.6",
+      "shutterSpeed": "1/680 s",
+      "iso": 32,
+      "orientation": "portrait",
+      "layoutHint": "portrait-right",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 3,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P009-v1-thumbnail.jpg",
+          "width": 360,
+          "height": 480,
+          "bytes": 76461
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P009-v1-preview.jpg",
+          "width": 960,
+          "height": 1280,
+          "bytes": 545472
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P009-v1-display.jpg",
+          "width": 1650,
+          "height": 2200,
+          "bytes": 1579389
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P009-v1-download.jpg",
+          "width": 1350,
+          "height": 1800,
+          "bytes": 1118491
+        }
+      }
+    },
+    {
+      "id": "P010",
+      "slug": "courtyard-lines",
+      "title": "Courtyard Lines",
+      "seriesId": "accidental-colour",
+      "dateTaken": "2026-08-06",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Red, teal and yellow paths tracing curves through a residential courtyard.",
+      "camera": "iPhone 15 Plus",
+      "lens": "iPhone 15 Plus back dual wide camera 5.96mm f/1.6",
+      "focalLength": "5.96 mm",
+      "aperture": "f/1.6",
+      "shutterSpeed": "1/1250 s",
+      "iso": 32,
+      "orientation": "portrait",
+      "layoutHint": "portrait-right",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 3,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P010-v1-thumbnail.jpg",
+          "width": 360,
+          "height": 480,
+          "bytes": 72907
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P010-v1-preview.jpg",
+          "width": 960,
+          "height": 1280,
+          "bytes": 537096
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P010-v1-display.jpg",
+          "width": 1650,
+          "height": 2200,
+          "bytes": 1577333
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P010-v1-download.jpg",
+          "width": 1350,
+          "height": 1800,
+          "bytes": 1114146
+        }
+      }
+    },
+    {
+      "id": "P011",
+      "slug": "under-the-arch",
+      "title": "Under the Arch",
+      "seriesId": "city-drifting",
+      "dateTaken": "2026-08-06",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "A sunlit neighborhood street seen through a dark curved concrete arch.",
+      "camera": "iPhone 15 Plus",
+      "lens": "iPhone 15 Plus back dual wide camera 5.96mm f/1.6",
+      "focalLength": "5.96 mm",
+      "aperture": "f/1.6",
+      "shutterSpeed": "1/690 s",
+      "iso": 32,
+      "orientation": "portrait",
+      "layoutHint": "portrait-left",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 2,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P011-v1-thumbnail.jpg",
+          "width": 360,
+          "height": 480,
+          "bytes": 68953
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P011-v1-preview.jpg",
+          "width": 960,
+          "height": 1280,
+          "bytes": 527878
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P011-v1-display.jpg",
+          "width": 1650,
+          "height": 2200,
+          "bytes": 1531569
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P011-v1-download.jpg",
+          "width": 1350,
+          "height": 1800,
+          "bytes": 1087726
+        }
+      }
+    },
+    {
+      "id": "P012",
+      "slug": "stairs-in-colour",
+      "title": "Stairs in Colour",
+      "seriesId": "accidental-colour",
+      "dateTaken": "2026-08-06",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Painted outdoor stairs patterned with saturated reds, blues and yellows in angled sunlight.",
+      "camera": "iPhone 15 Plus",
+      "lens": "iPhone 15 Plus back dual wide camera 5.96mm f/1.6",
+      "focalLength": "5.96 mm",
+      "aperture": "f/1.6",
+      "shutterSpeed": "1/530 s",
+      "iso": 32,
+      "orientation": "portrait",
+      "layoutHint": "portrait-left",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 2,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P012-v1-thumbnail.jpg",
+          "width": 360,
+          "height": 480,
+          "bytes": 66775
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P012-v1-preview.jpg",
+          "width": 960,
+          "height": 1280,
+          "bytes": 483399
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P012-v1-display.jpg",
+          "width": 1650,
+          "height": 2200,
+          "bytes": 1362319
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P012-v1-download.jpg",
+          "width": 1350,
+          "height": 1800,
+          "bytes": 978333
+        }
+      }
+    },
+    {
+      "id": "P013",
+      "slug": "waiting-to-play",
+      "title": "Waiting to Play",
+      "seriesId": "accidental-colour",
+      "dateTaken": "2026-08-06",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "Bright red, cyan and yellow playground equipment beside a tiled wall.",
+      "camera": "DJI Osmo Pocket 3",
+      "lens": null,
+      "focalLength": null,
+      "aperture": null,
+      "shutterSpeed": null,
+      "iso": null,
+      "orientation": "landscape",
+      "layoutHint": "wide",
+      "featured": false,
+      "allowDownload": true,
+      "sortOrder": 1,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P013-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 317,
+          "bytes": 62924
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P013-v1-preview.jpg",
+          "width": 1280,
+          "height": 845,
+          "bytes": 442441
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P013-v1-display.jpg",
+          "width": 2200,
+          "height": 1453,
+          "bytes": 1144853
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P013-v1-download.jpg",
+          "width": 1800,
+          "height": 1189,
+          "bytes": 852046
+        }
+      }
+    },
+    {
+      "id": "P014",
+      "slug": "between-buildings",
+      "title": "Between Buildings",
+      "seriesId": "city-drifting",
+      "dateTaken": "2026-08-06",
+      "datePublished": "2026-08-07",
+      "locationDisplay": "",
+      "caption": "",
+      "alt": "A narrow opening of sky between two dark residential buildings viewed from below.",
+      "camera": "DJI Osmo Pocket 3",
+      "lens": null,
+      "focalLength": null,
+      "aperture": null,
+      "shutterSpeed": null,
+      "iso": null,
+      "orientation": "landscape",
+      "layoutHint": "hero",
+      "featured": true,
+      "allowDownload": true,
+      "sortOrder": 1,
+      "assetVersion": 1,
+      "updatedAt": "2026-08-07T00:00:00Z",
+      "images": {
+        "thumbnail": {
+          "src": "/assets/photography/generated/thumbnail/P014-v1-thumbnail.jpg",
+          "width": 480,
+          "height": 270,
+          "bytes": 30627
+        },
+        "preview": {
+          "src": "/assets/photography/generated/preview/P014-v1-preview.jpg",
+          "width": 1280,
+          "height": 720,
+          "bytes": 254741
+        },
+        "display": {
+          "src": "/assets/photography/generated/display/P014-v1-display.jpg",
+          "width": 2200,
+          "height": 1237,
+          "bytes": 803933
+        },
+        "download": {
+          "src": "/assets/photography/generated/download/P014-v1-download.jpg",
+          "width": 1800,
+          "height": 1012,
+          "bytes": 555837
+        }
+      }
+    }
+  ]
+}

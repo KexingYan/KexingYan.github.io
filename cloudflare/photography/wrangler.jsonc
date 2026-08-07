@@ -1,0 +1,26 @@
+{
+  "name": "kexingyan-photography-foundation",
+  "compatibility_date": "2026-08-07",
+  "r2_buckets": [
+    {
+      "binding": "PHOTO_PUBLIC",
+      "bucket_name": "kexingyan-photography-public"
+    },
+    {
+      "binding": "PHOTO_MASTERS",
+      "bucket_name": "kexingyan-photography-private"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "PHOTOGRAPHY_DB",
+      "database_name": "kexingyan-photography",
+      "database_id": "<D1_DATABASE_ID>",
+      "migrations_dir": "../../migrations/photography"
+    }
+  ],
+  "vars": {
+    "PHOTOGRAPHY_ASSET_BASE": "https://images.kexingyan.com/photography/derivatives",
+    "PHOTOGRAPHY_MANIFEST_URL": "https://images.kexingyan.com/photography/manifests/current.json"
+  }
+}
