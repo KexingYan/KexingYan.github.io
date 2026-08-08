@@ -15,4 +15,5 @@ dist/
 assets/photography/generated/
 *photography-r2-plan*.json
 cloudflare/photography/wrangler.resolved.jsonc
+cloudflare/photography/wrangler.pages.resolved.jsonc
 .local/

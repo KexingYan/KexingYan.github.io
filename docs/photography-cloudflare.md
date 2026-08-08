@@ -1,10 +1,13 @@
 # Photography production architecture
 
-Status as of 2026-08-07: local production foundation and migration preflight are
-complete. External execution is blocked because this machine has no Node/npm,
-Wrangler, Cloudflare environment credentials, or authenticated Dashboard session.
-No Cloudflare resources have been discovered, created, or modified; no objects
-have been uploaded and no DNS or D1 write has occurred.
+Status as of 2026-08-08: Photography + Studio V1 passed production acceptance.
+Production Pages deployment `1dffe75a-ddb2-4a67-a91f-51c396866a7c` serves the
+public gallery and the Access-protected Studio/API. Rollback deployment
+`5a950b89-63bd-4dc9-bbf5-576344ecf4e6` remains available. Phase G storage is
+live with separate public/private R2 buckets, the D1 database,
+`images.kexingyan.com`, 14 accepted masters and 56 accepted derivatives.
+Migration `0003_admin_drafts.sql`, Pages bindings, server-only Access variables,
+and the owner-only Access application are active.
 
 ## Phase G actual values and boundary
 
@@ -15,10 +18,8 @@ Deterministic target names:
 - D1 database: `kexingyan-photography`
 - Public hostname: `images.kexingyan.com`
 
-These names are approved targets, not claims that the resources exist. Before
-creation, an authenticated operator must list existing R2 buckets, D1 databases,
-the `kexingyan.com` DNS record for `images`, and any existing R2 custom domains.
-Reuse a suitable existing resource instead of creating a duplicate.
+These are the production resource names. Future maintenance must discover and
+verify them before any write; never recreate them or infer replacements.
 
 The checked-in `cloudflare/photography/wrangler.jsonc` is deliberately
 non-deployable until `<D1_DATABASE_ID>` is replaced in an ignored copy named
@@ -33,12 +34,12 @@ Use a hybrid Cloudflare architecture with two R2 buckets:
    public-safe manifests. Attach `images.kexingyan.com` as its custom domain and
    disable the development `r2.dev` URL.
 2. A **private master bucket** stores originals. It has no custom domain and no
-   `r2.dev` public URL. Only a future authenticated Pages Function receives an R2
-   binding to it.
+   `r2.dev` public URL. Only the authenticated Pages Function receives its R2
+   binding.
 3. Cloudflare Pages continues to serve the static site. Public pages fetch the
    current manifest and JPEGs directly from the image domain; they do not proxy
    every public byte through a Function.
-4. D1 becomes the future private authoritative metadata store. A publish action
+4. D1 is the private authoritative metadata store. A publish action
    produces an immutable public snapshot plus a small `current.json` pointer in
    the public bucket.
 
@@ -50,7 +51,7 @@ is intended for development and does not provide the same caching controls.
 
 ## Why D1, not KV, R2 JSON, or Git JSON
 
-D1 is the recommended future authority because Studio requires ordered records,
+D1 is the production authority because Studio requires ordered records,
 draft/published state, asset-version history, constraints, and multi-record
 reordering. D1 batch operations are transactional, and Time Travel supplies
 point-in-time recovery. The schema is in
@@ -107,10 +108,10 @@ Replacing P014 keeps `id=P014`, increments `assetVersion` to 2, and writes new
 separately reviewed retention cleanup. R2 overwrites can remain cached until TTL
 or purge, so immutable objects must never be replaced in place.
 
-## Manual authentication and read-only discovery
+## Maintenance authentication and read-only discovery
 
-The current blocker must be resolved by the owner; do not paste credentials into
-chat, Git, shell history, or public logs.
+Use this sequence before future maintenance. Do not paste credentials into chat,
+Git, shell history, or public logs.
 
 1. Install a supported Node.js LTS runtime if desired, then authenticate
    interactively with `npx wrangler@latest login`. Alternatively sign in to the
@@ -130,10 +131,11 @@ chat, Git, shell history, or public logs.
    and DNS result in an owner-only location. Only the D1 database ID belongs in
    the ignored resolved Wrangler file; no IDs are guessed.
 
-## Manual Cloudflare setup after discovery
+## Production setup record and future recovery procedure
 
-These are future dashboard/CLI steps, not actions performed by the preparation
-scripts:
+The production resources already exist. The commands below are retained only as
+a recovery/reference procedure; do not rerun creation, initial seed, or domain
+attachment against the accepted environment.
 
 1. If discovery found no suitable resources, create the two buckets and D1:
 
@@ -172,7 +174,7 @@ scripts:
      --file /owner-only/path/photography-d1-initial-seed.sql
    ```
 
-6. Add future Pages Function bindings:
+6. Active Pages Function bindings:
    - `PHOTO_MASTERS`: private R2 bucket
    - `PHOTO_PUBLIC`: public R2 bucket
    - `PHOTOGRAPHY_DB`: D1 database
@@ -180,9 +182,11 @@ scripts:
 7. Add non-secret Pages build variables:
    - `PHOTOGRAPHY_ASSET_BASE=https://images.kexingyan.com/photography/derivatives`
    - `PHOTOGRAPHY_MANIFEST_URL=https://images.kexingyan.com/photography/manifests/current.json`
-8. Add secret/server-only Access settings when the API exists:
+8. Active server-only Access settings:
    - `CF_ACCESS_TEAM_DOMAIN`
    - `CF_ACCESS_AUD`
+   - `PHOTO_ADMIN_OWNER_EMAILS`
+   - `PHOTO_ADMIN_ALLOWED_ORIGINS`
 
 9. Upload in this order from the reviewed private plan: 14 masters, 56 immutable
    derivatives, verify all derivative objects, immutable manifest snapshot, then
@@ -202,8 +206,8 @@ scripts:
     guessed zone ID. Verify the private bucket still has no domain.
 
 No R2 API token, account identifier, service token, owner email, or Access secret
-belongs in Git or public JavaScript. No `.dev.vars.example` is added yet because
-there is no executable Function in this phase.
+belongs in Git or public JavaScript. No resolved `.dev.vars` file is checked in;
+production owner and Access values remain in Cloudflare's server-side settings.
 
 ### Public-safe configuration
 
@@ -223,9 +227,9 @@ there is no executable Function in this phase.
 
 ## Access and admin boundary
 
-Create Cloudflare Access applications for both `/studio/*` and
-`/api/photo-admin/*`, with an owner-only allow policy. Hiding Studio is not API
-authorization. Every future Function must validate the
+One self-hosted Cloudflare Access application now has two destinations,
+`kexingyan.com/studio/*` and `kexingyan.com/api/photo-admin/*`, and an owner-only
+allow policy using one-time PIN. Hiding Studio is not API authorization. Every Function validates the
 `Cf-Access-Jwt-Assertion` signature, issuer, audience, expiry, and allowed owner
 identity before reading private data or mutating anything. Mutation endpoints
 also enforce origin/CSRF defenses and JSON content types. The owner's identity is
@@ -233,21 +237,18 @@ server-side configuration, never a value embedded in public JS.
 
 ## Processing strategy
 
-V1 uses a **hybrid local ingest**:
+V1 supports both controlled local ingest and the owner-only browser upload path:
 
 ```text
-private master -> local Python/Pillow validation and derivatives
-               -> dry-run upload plan
-               -> private/public R2 upload
-               -> metadata publish
+local: master -> Python/Pillow validation -> four derivatives -> draft package
+online: owner browser -> decode/normalize -> four derivatives -> Pages Function
+                    -> private/public R2 + D1 draft -> preview -> publish
 ```
 
-The existing masters can exceed the Cloudflare Images binding's raw-input limit,
-and Workers cannot run this Python/Pillow script unchanged. For the first owner
-Studio, metadata/order/publish operations can be online while image replacement
-remains a controlled local publishing command. A later proof of concept may use
-Cloudflare Images remote transformations or a Worker-compatible pipeline, but it
-must pass the upload contract in `docs/photography-admin-api.md` before adoption.
+The local path remains the safest batch/recovery workflow and never publishes
+implicitly. Studio V1 also accepts owner-selected JPEGs, creates four browser
+derivatives, stores the unchanged master privately, and leaves the result as a
+draft until explicit Preview and Publish. Cloudflare Images is not part of V1.
 
 ## Local and production builds
 
@@ -270,9 +271,29 @@ python3 scripts/build_photography_release.py \
   --manifest-url "$PHOTOGRAPHY_MANIFEST_URL"
 ```
 
-Configure Pages to deploy `dist` only after the R2 objects and `current.json` are
-verified. The source tree remains usable locally, and the release tree references
-the R2 image hostname.
+Production Pages deploys the release tree with Studio explicitly included behind
+verified Access. The source tree remains usable locally, and the release tree
+references the R2 image hostname.
+
+## Final production flow
+
+```text
+Public
+kexingyan.com/photography/
+  -> public-safe current.json
+  -> images.kexingyan.com
+  -> public R2 versioned derivatives
+
+Private
+Cloudflare Access
+  -> /studio/ and /api/photo-admin/*
+  -> Pages Functions
+  -> D1 + private/public R2 bindings
+
+Publish
+Draft -> Preview -> Validate -> immutable manifest -> verify
+      -> current.json LAST -> D1 publish revision
+```
 
 ## Non-destructive migration for P001–P014
 

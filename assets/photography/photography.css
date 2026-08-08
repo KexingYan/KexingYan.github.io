@@ -7,6 +7,12 @@
   --photo-line: rgba(255, 255, 255, 0.12);
   --photo-gutter: clamp(20px, 4.5vw, 76px);
   --photo-max: 1600px;
+  --motion-fast: 220ms;
+  --motion-ui: 280ms;
+  --motion-photo: 760ms;
+  --motion-hero: 900ms;
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-photo: cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
 * {
@@ -170,15 +176,13 @@ a:focus-visible {
   width: 100%;
   height: auto;
   background: var(--photo-surface);
-  transition: filter 300ms ease, transform 500ms ease;
-}
-
-.photo-open:hover img {
-  filter: brightness(1.035);
-  transform: scale(1.006);
+  transition:
+    filter var(--motion-ui) var(--ease-standard),
+    transform 560ms var(--ease-photo);
 }
 
 .image-clip {
+  display: block;
   overflow: hidden;
 }
 
@@ -253,6 +257,51 @@ a:focus-visible {
   align-items: start;
 }
 
+.series.motion-pending .series-number,
+.series.motion-pending .series-heading h2,
+.series.motion-pending .series-heading p,
+.photo-figure.motion-pending {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.series .series-number,
+.series .series-heading h2,
+.series .series-heading p,
+.photo-figure {
+  transition:
+    opacity var(--motion-photo) var(--ease-photo),
+    transform var(--motion-photo) var(--ease-photo);
+}
+
+.series.motion-pending .series-heading h2 {
+  transition-delay: 80ms;
+}
+
+.series.motion-pending .series-heading p {
+  transition-delay: 160ms;
+}
+
+.photo-figure.motion-pending {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.photo-figure.motion-pending .photo-open img {
+  filter: brightness(0.94);
+}
+
+.photo-figure.is-revealed,
+.series.is-revealed .series-number,
+.series.is-revealed .series-heading h2,
+.series.is-revealed .series-heading p {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.photo-figure.is-revealed .photo-open img {
+  filter: brightness(1);
+}
+
 .layout-wide,
 .layout-hero {
   grid-column: 1 / -1;
@@ -325,6 +374,14 @@ dialog::backdrop {
   background: rgba(0, 0, 0, 0.88);
 }
 
+dialog[open]::backdrop {
+  animation: dialog-backdrop-in var(--motion-ui) ease-out both;
+}
+
+dialog.is-closing::backdrop {
+  animation: dialog-backdrop-out var(--motion-fast) ease-in both;
+}
+
 .dialog-close {
   display: inline-grid;
   width: 48px;
@@ -341,6 +398,14 @@ dialog::backdrop {
 .index-shell {
   min-height: 100%;
   padding: 28px var(--photo-gutter) 80px;
+}
+
+#photo-index[open] .index-shell {
+  animation: index-in var(--motion-ui) var(--ease-standard) both;
+}
+
+#photo-index.is-closing .index-shell {
+  animation: index-out var(--motion-fast) ease-in both;
 }
 
 .dialog-head {
@@ -373,6 +438,11 @@ dialog::backdrop {
   color: inherit;
   cursor: pointer;
   text-align: left;
+}
+
+#photo-index[open] .contact-item {
+  animation: contact-in var(--motion-ui) var(--ease-standard) both;
+  animation-delay: var(--index-delay, 0ms);
 }
 
 .contact-item img {
@@ -413,6 +483,14 @@ dialog::backdrop {
   min-height: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
+}
+
+#lightbox[open] .lightbox-shell {
+  animation: lightbox-in 380ms var(--ease-photo) both;
+}
+
+#lightbox.is-closing .lightbox-shell {
+  animation: lightbox-out 260ms ease-in both;
 }
 
 .lightbox-bar {
@@ -462,6 +540,14 @@ dialog::backdrop {
   display: grid;
   min-height: 0;
   place-items: center;
+  transition:
+    opacity 110ms linear,
+    transform 110ms var(--ease-standard);
+}
+
+.lightbox-image-wrap.is-switching {
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .lightbox-image-wrap img {
@@ -538,6 +624,14 @@ dialog::backdrop {
   margin: auto;
   border: 1px solid var(--photo-line);
   background: #111;
+}
+
+.license-dialog[open] .license-confirm {
+  animation: license-in 240ms var(--ease-standard) both;
+}
+
+.license-dialog.is-closing .license-confirm {
+  animation: license-out 200ms ease-in both;
 }
 
 .license-confirm {
@@ -632,6 +726,113 @@ dialog::backdrop {
 
 .license-section a {
   text-underline-offset: 4px;
+}
+
+@keyframes entry-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes entry-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-reveal {
+  from {
+    opacity: 0.72;
+    clip-path: inset(4% 0 5% 0);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes dialog-backdrop-in {
+  from { background: rgba(0, 0, 0, 0); }
+  to { background: rgba(0, 0, 0, 0.88); }
+}
+
+@keyframes dialog-backdrop-out {
+  from { background: rgba(0, 0, 0, 0.88); }
+  to { background: rgba(0, 0, 0, 0); }
+}
+
+@keyframes index-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes index-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes contact-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lightbox-in {
+  from { opacity: 0; transform: scale(0.99); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lightbox-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.99); }
+}
+
+@keyframes license-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes license-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .photo-header {
+    animation: entry-fade 360ms ease-out 120ms both;
+  }
+
+  .photo-intro > div:first-child {
+    animation: entry-rise 560ms var(--ease-standard) 260ms both;
+  }
+
+  .intro-copy {
+    animation: entry-rise 620ms var(--ease-standard) 380ms both;
+  }
+
+  .hero-photo .image-clip {
+    animation: hero-reveal var(--motion-hero) var(--ease-photo) 500ms both;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .photo-open:hover img {
+    filter: brightness(1.035);
+    transform: scale(1.012);
+  }
+
+  .hero-photo .photo-open:hover img {
+    transform: none;
+  }
+
+  .photo-caption {
+    opacity: 0.72;
+    transition: opacity var(--motion-ui) ease-out;
+  }
+
+  .photo-figure:focus-within .photo-caption,
+  .photo-figure:hover .photo-caption {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 900px) {
@@ -772,6 +973,11 @@ dialog::backdrop {
   .license-grid {
     grid-template-columns: 1fr;
   }
+
+  dialog {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -786,5 +992,37 @@ dialog::backdrop {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .series.motion-pending .series-number,
+  .series.motion-pending .series-heading h2,
+  .series.motion-pending .series-heading p,
+  .photo-figure.motion-pending,
+  .photo-figure.motion-pending .photo-open img,
+  .lightbox-image-wrap.is-switching {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .hero-photo .image-clip {
+    clip-path: none !important;
+  }
+
+  .photo-header,
+  .photo-intro > div:first-child,
+  .intro-copy,
+  .hero-photo .image-clip,
+  dialog[open]::backdrop,
+  #photo-index[open] .index-shell,
+  #photo-index[open] .contact-item,
+  #lightbox[open] .lightbox-shell,
+  .license-dialog[open] .license-confirm {
+    animation: none !important;
+    animation-delay: 0ms !important;
+  }
+
+  .photo-open:hover img {
+    transform: none !important;
   }
 }

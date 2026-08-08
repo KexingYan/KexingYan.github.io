@@ -1,5 +1,5 @@
 const root = document.querySelector("#preview-content");
-const raw = localStorage.getItem("kx-photography-preview-manifest");
+let raw = localStorage.getItem("kx-photography-preview-manifest");
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -34,9 +34,16 @@ function figure(photo, hero = false) {
   return item;
 }
 
-if (!raw) {
-  root.innerHTML = '<p class="photo-status">No draft preview is available. Return to Studio and choose Preview.</p>';
-} else {
+async function loadPreview() {
+  if (!raw && !["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
+    const response = await fetch("/api/photo-admin/preview", { credentials: "same-origin" });
+    if (!response.ok) throw new Error("The owner-only draft preview is unavailable.");
+    raw = JSON.stringify(await response.json());
+  }
+  if (!raw) {
+    root.innerHTML = '<p class="photo-status">No draft preview is available. Return to Studio and choose Preview.</p>';
+    return;
+  }
   const manifest = JSON.parse(raw);
   const fragment = document.createDocumentFragment();
   const hero = manifest.photos.find((photo) => photo.featured) || manifest.photos[0];
@@ -56,3 +63,5 @@ if (!raw) {
   fragment.append(seriesList);
   root.replaceChildren(fragment);
 }
+
+loadPreview().catch((error) => { root.innerHTML = `<p class="photo-status">${error.message}</p>`; });

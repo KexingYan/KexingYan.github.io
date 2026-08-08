@@ -100,6 +100,9 @@
       --accent: #2454a6;
       --accent-soft: #eef3ff;
       --max: 1080px;
+      --motion-ui: 280ms;
+      --motion-feature: 520ms;
+      --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * {
@@ -521,12 +524,32 @@
       display: block;
       width: 100%;
       height: auto;
-      transition: filter 0.35s ease, transform 0.5s ease;
+      transition:
+        filter var(--motion-ui) ease,
+        transform var(--motion-feature) var(--ease-standard);
     }
 
-    .photo-feature-image:hover img {
-      filter: brightness(1.025);
-      transform: scale(1.01);
+    #photography.motion-pending .photo-feature-image,
+    #photography.motion-pending .photo-feature-copy {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    #photography .photo-feature-image,
+    #photography .photo-feature-copy {
+      transition:
+        opacity var(--motion-feature) var(--ease-standard),
+        transform var(--motion-feature) var(--ease-standard);
+    }
+
+    #photography.motion-pending .photo-feature-copy {
+      transition-delay: 70ms;
+    }
+
+    #photography.is-revealed .photo-feature-image,
+    #photography.is-revealed .photo-feature-copy {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .photo-feature-label {
@@ -563,11 +586,18 @@
     }
 
     .photo-feature-link span {
-      transition: transform 0.2s ease;
+      transition: transform var(--motion-ui) var(--ease-standard);
     }
 
-    .photo-feature-link:hover span {
-      transform: translateX(4px);
+    @media (hover: hover) and (pointer: fine) {
+      .photo-feature-image:hover img {
+        filter: brightness(1.025);
+        transform: scale(1.012);
+      }
+
+      .photo-feature-link:hover span:last-child {
+        transform: translateX(5px);
+      }
     }
 
     .contact-link {
@@ -682,6 +712,30 @@
         display: block;
         margin-top: 6px;
         white-space: normal;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      #photography.motion-pending .photo-feature-image,
+      #photography.motion-pending .photo-feature-copy {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+
+      .photo-feature-image img,
+      .photo-feature-link span {
+        transition: none;
+      }
+
+      .photo-feature-image:hover img,
+      .photo-feature-link:hover span:last-child {
+        filter: none;
+        transform: none;
       }
     }
   </style>
@@ -1153,6 +1207,25 @@
 
     window.addEventListener("scroll", updateActiveLink, { passive: true });
     updateActiveLink();
+  </script>
+  <script>
+    (function () {
+      var feature = document.querySelector("#photography");
+      if (!feature || !("IntersectionObserver" in window)
+          || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          feature.classList.add("is-revealed");
+          feature.classList.remove("motion-pending");
+          observer.unobserve(feature);
+        });
+      }, { rootMargin: "0px 0px 10% 0px", threshold: 0.12 });
+
+      feature.classList.add("motion-pending");
+      observer.observe(feature);
+    })();
   </script>
 </body>
 </html>

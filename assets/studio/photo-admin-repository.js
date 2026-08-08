@@ -284,5 +284,220 @@ export class LocalPhotoAdminRepository {
   }
 }
 
-// Future CloudflarePhotoAdminRepository will implement the same methods against
-// /api/photo-admin/* after Cloudflare Access and server-side JWT validation exist.
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`/api/photo-admin${path}`, {
+    credentials: "same-origin",
+    headers: options.body instanceof FormData ? options.headers : {
+      "content-type": "application/json",
+      ...options.headers,
+    },
+    ...options,
+  });
+  const contentType = response.headers.get("content-type") || "";
+  const payload = contentType.includes("application/json") ? await response.json() : null;
+  if (!response.ok) {
+    const error = new Error(payload?.error?.message || `Studio request failed (${response.status}).`);
+    error.code = payload?.error?.code || "request_failed";
+    error.status = response.status;
+    error.fields = payload?.error?.fields;
+    if (response.status === 401) error.message = "Your Access session expired. Reload Studio to sign in again.";
+    throw error;
+  }
+  return payload;
+}
+
+async function decodeJpeg(file) {
+  if (file.type !== "image/jpeg") throw new Error(`${file.name} is not a JPEG.`);
+  if (file.size > 50 * 1024 * 1024) throw new Error(`${file.name} exceeds the 50 MiB limit.`);
+  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  if (!bitmap.width || !bitmap.height || bitmap.width > 12000 || bitmap.height > 12000 || bitmap.width * bitmap.height > 80_000_000) {
+    bitmap.close();
+    throw new Error(`${file.name} exceeds the 12,000px or 80MP limit.`);
+  }
+  return bitmap;
+}
+
+async function readBasicExif(file) {
+  const bytes = new Uint8Array(await file.slice(0, 1024 * 1024).arrayBuffer());
+  const view = new DataView(bytes.buffer);
+  let offset = 2;
+  while (offset + 10 < bytes.length) {
+    if (bytes[offset] !== 0xff) break;
+    const marker = bytes[offset + 1];
+    const length = view.getUint16(offset + 2, false);
+    if (marker === 0xe1 && String.fromCharCode(...bytes.slice(offset + 4, offset + 10)) === "Exif\0\0") {
+      const tiff = offset + 10;
+      const little = view.getUint16(tiff, false) === 0x4949;
+      const u16 = (at) => view.getUint16(at, little);
+      const u32 = (at) => view.getUint32(at, little);
+      if (u16(tiff + 2) !== 42) return {};
+      const values = {};
+      const sizes = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8 };
+      const readEntry = (entry) => {
+        const type = u16(entry + 2);
+        const count = u32(entry + 4);
+        const size = (sizes[type] || 0) * count;
+        const data = size <= 4 ? entry + 8 : tiff + u32(entry + 8);
+        if (!size || data < 0 || data + size > bytes.length) return null;
+        if (type === 2) return new TextDecoder().decode(bytes.slice(data, data + Math.max(0, count - 1))).trim();
+        if (type === 3) return u16(data);
+        if (type === 4) return u32(data);
+        if (type === 5) {
+          const denominator = u32(data + 4);
+          return denominator ? u32(data) / denominator : null;
+        }
+        return null;
+      };
+      const readIfd = (ifdOffset) => {
+        const start = tiff + ifdOffset;
+        if (start + 2 > bytes.length) return;
+        const count = u16(start);
+        for (let index = 0; index < count; index += 1) {
+          const entry = start + 2 + index * 12;
+          if (entry + 12 > bytes.length) break;
+          const tag = u16(entry);
+          values[tag] = readEntry(entry);
+        }
+      };
+      readIfd(u32(tiff + 4));
+      if (values[0x8769]) readIfd(values[0x8769]);
+      const exposure = values[0x829a];
+      const make = values[0x010f] || "";
+      const model = values[0x0110] || "";
+      return {
+        camera: `${make} ${model}`.trim() || null,
+        lens: values[0xa434] || null,
+        focalLength: values[0x920a] ? `${Math.round(values[0x920a] * 10) / 10} mm` : null,
+        aperture: values[0x829d] ? `f/${Math.round(values[0x829d] * 10) / 10}` : null,
+        shutterSpeed: exposure ? (exposure < 1 ? `1/${Math.round(1 / exposure)} s` : `${exposure} s`) : null,
+        iso: values[0x8827] || null,
+        dateTaken: typeof values[0x9003] === "string" ? values[0x9003].slice(0, 10).replace(/:/g, "-") : null,
+      };
+    }
+    if (length < 2) break;
+    offset += 2 + length;
+  }
+  return {};
+}
+
+async function derivative(bitmap, maximum, quality) {
+  const scale = Math.min(1, maximum / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d", { alpha: false, colorSpace: "srgb" });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(bitmap, 0, 0, width, height);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+  if (!blob) throw new Error("The browser could not encode a JPEG derivative.");
+  return blob;
+}
+
+export class CloudflarePhotoAdminRepository {
+  constructor() { this.state = null; }
+  async initialize() { return this.refresh(); }
+  read() {
+    if (!this.state) throw new Error("Repository is not initialized.");
+    return clone(this.state);
+  }
+  async refresh() {
+    this.state = await apiRequest("/photos", { method: "GET", headers: {} });
+    return this.read();
+  }
+  async listPhotos() { return clone((await this.refresh()).photos); }
+  async getPhoto(id) {
+    const payload = await apiRequest(`/photos/${encodeURIComponent(id)}`, { method: "GET", headers: {} });
+    return payload.photo;
+  }
+  async saveDraft(photo) {
+    const payload = await apiRequest(`/photos/${encodeURIComponent(photo.id)}`, {
+      method: "PATCH", body: JSON.stringify({ ...photo, expectedUpdatedAt: photo.updatedAt }),
+    });
+    await this.refresh();
+    return payload.photo;
+  }
+  async createDraft(photo) {
+    const payload = await apiRequest("/photos", { method: "POST", body: JSON.stringify(photo) });
+    await this.refresh();
+    return payload.photo;
+  }
+  async archivePhoto(id, expectedUpdatedAt) {
+    const payload = await apiRequest(`/photos/${encodeURIComponent(id)}/archive`, {
+      method: "POST", body: JSON.stringify({ expectedUpdatedAt, confirm: true }),
+    });
+    await this.refresh();
+    return payload.photo;
+  }
+  async reorderPhotos(seriesId, orderedPhotoIds) {
+    await apiRequest("/photos/reorder", {
+      method: "POST", body: JSON.stringify({ seriesId, orderedPhotoIds, expectedRevision: this.state.revision }),
+    });
+    return (await this.refresh()).photos;
+  }
+  async listSeries() { return clone((this.state || await this.refresh()).series); }
+  async updateSeries(series) {
+    const payload = await apiRequest(`/series/${encodeURIComponent(series.id)}`, {
+      method: "PATCH", body: JSON.stringify({ ...series, expectedUpdatedAt: series.updatedAt }),
+    });
+    await this.refresh();
+    return payload.series;
+  }
+  async reorderSeries() { throw new Error("Series reordering remains a controlled D1 operation in V1."); }
+  async exportPreviewManifest() { return apiRequest("/preview", { method: "GET", headers: {} }); }
+  async publishChanges() {
+    const result = await apiRequest("/publish", {
+      method: "POST", body: JSON.stringify({ confirm: true, expectedRevision: this.state.revision }),
+    });
+    await this.refresh();
+    return result;
+  }
+  async prepareUpload(files) {
+    const proposals = [];
+    for (const file of files) {
+      const bitmap = await decodeJpeg(file);
+      const exif = await readBasicExif(file);
+      proposals.push({
+        id: `upload-${crypto.randomUUID()}`,
+        file,
+        sourceFilename: file.name,
+        sourceBytes: file.size,
+        mimeType: file.type,
+        localPreviewUrl: URL.createObjectURL(file),
+        title: file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "),
+        orientation: bitmap.height > bitmap.width ? "portrait" : "landscape",
+        originalWidth: bitmap.width,
+        originalHeight: bitmap.height,
+        exif,
+        processingState: "selected",
+      });
+      bitmap.close();
+    }
+    return { persistentUpload: true, message: "JPEGs validated locally. Save draft to generate and upload four derivatives.", proposals };
+  }
+  async uploadAssets(id, file, expectedUpdatedAt, replace = false) {
+    const bitmap = await decodeJpeg(file);
+    try {
+      const form = new FormData();
+      form.set("expectedUpdatedAt", expectedUpdatedAt);
+      form.set("master", file, "master.jpg");
+      const settings = { thumbnail: [480, 0.84], preview: [1280, 0.88], display: [2200, 0.9], download: [1800, 0.9] };
+      for (const [variant, [maximum, quality]] of Object.entries(settings)) {
+        form.set(variant, await derivative(bitmap, maximum, quality), `${variant}.jpg`);
+      }
+      const payload = await apiRequest(`/photos/${encodeURIComponent(id)}/${replace ? "replace" : "assets"}`, {
+        method: "POST", body: form,
+        headers: replace ? { "x-photography-confirm-replace": "replace" } : {},
+      });
+      await this.refresh();
+      return payload;
+    } finally { bitmap.close(); }
+  }
+}
+
+export function createPhotoAdminRepository() {
+  const local = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+  return local ? new LocalPhotoAdminRepository() : new CloudflarePhotoAdminRepository();
+}

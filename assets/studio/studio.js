@@ -1,8 +1,9 @@
 import {
-  LocalPhotoAdminRepository,
+  createPhotoAdminRepository,
 } from "/assets/studio/photo-admin-repository.js";
 
-const repository = new LocalPhotoAdminRepository();
+const repository = createPhotoAdminRepository();
+const isLocalRepository = repository.constructor.name === "LocalPhotoAdminRepository";
 const archiveGrid = document.querySelector("#archive-grid");
 const message = document.querySelector("#studio-message");
 const editor = document.querySelector("#photo-editor");
@@ -85,6 +86,8 @@ function renderArchive() {
           <span class="archive-title">${escapeHtml(photo.title)}</span>
           <span class="archive-id">${escapeHtml(photo.id)} · v${photo.assetVersion}</span>
           <span class="archive-series">${escapeHtml(seriesById.get(photo.seriesId)?.title || photo.seriesId)}</span>
+          <span class="archive-id">${photo.featured ? "Featured · " : ""}${photo.allowDownload ? "Download on" : "Download off"} · order ${photo.sortOrder}</span>
+          <span class="archive-id">Updated ${escapeHtml(displayDate(photo.updatedAt))}</span>
         </span>
       </button>
       <div class="order-actions" aria-label="Order ${escapeHtml(photo.title)}">
@@ -205,7 +208,7 @@ async function saveEditorDraft() {
   const saved = await repository.saveDraft(recordFromEditor());
   selectedPhotoId = saved.id;
   await refreshState();
-  setMessage(`${saved.title} saved as a local draft. Public Photography is unchanged.`);
+  setMessage(`${saved.title} saved as a draft. Public Photography is unchanged.`);
   return saved;
 }
 
@@ -218,19 +221,29 @@ editorForm.addEventListener("submit", async (event) => {
 document.querySelector("#publish-photo").addEventListener("click", async () => {
   try {
     const saved = await saveEditorDraft();
-    await repository.publishPhoto(saved.id);
+    if (isLocalRepository) {
+      await repository.publishPhoto(saved.id);
+    } else {
+      const draftChanges = state.photos.filter((photo) => photo.hasDraft || photo.status === "draft" || photo.status === "archived").length;
+      const publishedCount = state.photos.filter((photo) => photo.status !== "archived").length;
+      if (!window.confirm(`${publishedCount} published photographs\n${state.series.length} series\n${draftChanges} draft changes\n\nPublish now?`)) return;
+      const result = await repository.publishChanges();
+      setMessage(`Published revision ${result.revision}. current.json was updated last and verified.`);
+    }
     await refreshState();
     editor.close();
-    setMessage(`${saved.title} published to local mock state only. No public file or cloud resource changed.`);
+    if (isLocalRepository) setMessage(`${saved.title} published to local mock state only. No public file or cloud resource changed.`);
   } catch (error) { setMessage(error.message, true); }
 });
 
 document.querySelector("#archive-photo").addEventListener("click", async () => {
   try {
-    const photo = await repository.archivePhoto(selectedPhotoId);
+    const current = state.photos.find((item) => item.id === selectedPhotoId);
+    if (!window.confirm(`Archive ${current.title}?\n\nIt will be excluded from the next public manifest. No image file will be deleted.`)) return;
+    const photo = await repository.archivePhoto(selectedPhotoId, current.updatedAt);
     await refreshState();
     editor.close();
-    setMessage(`${photo.title} archived locally. No file was deleted.`);
+    setMessage(`${photo.title} staged as archived. No file was deleted.`);
   } catch (error) { setMessage(error.message, true); }
 });
 
@@ -291,12 +304,12 @@ async function prepareFiles(files) {
         <div class="ingest-proposal-fields">
           <input class="proposal-title full" aria-label="Title" value="${escapeHtml(proposal.title)}" />
           <select class="proposal-series" aria-label="Series">${series.map((item) => `<option value="${item.id}">${escapeHtml(item.title)}</option>`).join("")}</select>
-          <input class="proposal-date" aria-label="Date" type="date" />
+          <input class="proposal-date" aria-label="Date" type="date" value="${escapeHtml(proposal.exif?.dateTaken || "")}" />
           <input class="proposal-caption full" aria-label="Caption" placeholder="Caption" />
           <input class="proposal-alt full" aria-label="Alt text" placeholder="Alt text required" />
           <select class="proposal-layout" aria-label="Layout"><option>standard</option><option>wide</option><option>portrait-left</option><option>portrait-right</option><option>panorama</option></select>
           <label><input class="proposal-download" type="checkbox" checked /> Allow download</label>
-          <p class="honesty-note full">EXIF detected: pending offline ingest · ${escapeHtml(proposal.mimeType)} · ${Math.round(proposal.sourceBytes / 1024)} KiB</p>
+          <p class="honesty-note full">Detected: ${proposal.originalWidth || "—"} × ${proposal.originalHeight || "—"} · ${escapeHtml(proposal.exif?.camera || "EXIF camera unavailable")} · ${escapeHtml(proposal.exif?.lens || "lens unavailable")} · ${Math.round(proposal.sourceBytes / 1024)} KiB</p>
         </div>
         <button type="button" data-save-proposal="${proposal.id}">Save draft</button>
       </article>`).join("");
@@ -309,8 +322,9 @@ async function prepareFiles(files) {
 async function saveProposal(proposal) {
   const root = document.querySelector(`[data-proposal-id="${proposal.id}"]`);
   try {
-    await repository.saveDraft({
+    const record = {
       ...proposal,
+      file: undefined,
       slug: "",
       title: root.querySelector(".proposal-title").value.trim(),
       seriesId: root.querySelector(".proposal-series").value,
@@ -319,8 +333,13 @@ async function saveProposal(proposal) {
       locationDisplay: "",
       caption: root.querySelector(".proposal-caption").value.trim(),
       alt: root.querySelector(".proposal-alt").value.trim(),
-      camera: null, lens: null, focalLength: null, aperture: null, shutterSpeed: null, iso: null,
-      orientation: "landscape",
+      camera: proposal.exif?.camera || null,
+      lens: proposal.exif?.lens || null,
+      focalLength: proposal.exif?.focalLength || null,
+      aperture: proposal.exif?.aperture || null,
+      shutterSpeed: proposal.exif?.shutterSpeed || null,
+      iso: proposal.exif?.iso || null,
+      orientation: proposal.orientation || "landscape",
       layoutHint: root.querySelector(".proposal-layout").value,
       featured: false,
       allowDownload: root.querySelector(".proposal-download").checked,
@@ -328,12 +347,46 @@ async function saveProposal(proposal) {
       status: "draft",
       assetVersion: 1,
       images: null,
-    });
+    };
+    const saved = isLocalRepository
+      ? await repository.saveDraft({ ...record, id: proposal.id })
+      : await repository.createDraft(record);
+    if (!isLocalRepository) {
+      setMessage(`${saved.id}: generating and uploading derivatives…`);
+      await repository.uploadAssets(saved.id, proposal.file, saved.updatedAt, false);
+    }
     root.remove();
     await refreshState();
-    setMessage(`${proposal.id} saved as metadata-only draft. Run offline ingest before publishing.`);
+    setMessage(isLocalRepository
+      ? `${proposal.id} saved as metadata-only draft. Run offline ingest before publishing.`
+      : `${saved.id} master stored privately and four versioned derivatives stored publicly as a draft.`);
   } catch (error) { setMessage(error.message, true); }
 }
+
+const replaceInput = document.querySelector("#replace-file");
+document.querySelector("#replace-photo").addEventListener("click", () => replaceInput.click());
+replaceInput.addEventListener("change", async () => {
+  const file = replaceInput.files?.[0];
+  if (!file) return;
+  const current = state.photos.find((photo) => photo.id === selectedPhotoId);
+  if (isLocalRepository) {
+    setMessage("Replacement is available through the offline ingest command in local prototype mode.", true);
+    replaceInput.value = "";
+    return;
+  }
+  if (!window.confirm(`Replace the image for ${current.id} · ${current.title}?\n\nIdentity stays ${current.id}; assetVersion will increment and old objects will remain.`)) {
+    replaceInput.value = "";
+    return;
+  }
+  try {
+    setMessage(`Preparing ${file.name}…`);
+    const result = await repository.uploadAssets(current.id, file, current.updatedAt, true);
+    await refreshState();
+    editor.close();
+    setMessage(`${current.id} replacement v${result.assetVersion} is ready as a draft. Public Photography is unchanged.`);
+  } catch (error) { setMessage(error.message, true); }
+  finally { replaceInput.value = ""; }
+});
 
 document.querySelector("#manage-series").addEventListener("click", () => { renderSeriesEditor(); seriesDialog.showModal(); });
 
@@ -360,7 +413,9 @@ function renderSeriesEditor() {
 
 async function saveSeries(id) {
   const root = document.querySelector(`[data-series-entry="${id}"]`);
+  const current = state.series.find((series) => series.id === id);
   await repository.updateSeries({
+    ...current,
     id,
     title: root.querySelector(".series-title").value.trim(),
     description: root.querySelector(".series-description").value.trim(),
@@ -369,7 +424,7 @@ async function saveSeries(id) {
   });
   await refreshState();
   renderSeriesEditor();
-  setMessage("Series changes saved locally and included in Preview.");
+  setMessage("Series changes saved and included in Preview.");
 }
 
 async function moveSeries(id, direction) {
@@ -384,6 +439,7 @@ async function moveSeries(id, direction) {
 }
 
 document.querySelector("#reset-fixture").addEventListener("click", async () => {
+  if (!isLocalRepository) return;
   if (!window.confirm("Reset only the local Studio fixture? Public Photography and source files are unaffected.")) return;
   await repository.resetLocalFixture();
   await refreshState();
@@ -393,7 +449,13 @@ document.querySelector("#reset-fixture").addEventListener("click", async () => {
 try {
   await repository.initialize();
   await refreshState();
-  setMessage("Local fixture ready. Changes stay in this browser only.");
+  document.querySelector("#environment-note").innerHTML = isLocalRepository
+    ? "<span></span> Local prototype · no cloud connection"
+    : "<span></span> Owner session · Cloudflare Access";
+  document.querySelector("#reset-fixture").hidden = !isLocalRepository;
+  setMessage(isLocalRepository
+    ? "Local fixture ready. Changes stay in this browser only."
+    : "Studio connected. Draft edits do not affect public Photography until Publish.");
 } catch (error) {
   setMessage(error.message, true);
 }

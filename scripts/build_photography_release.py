@@ -25,6 +25,10 @@ PUBLIC_DIRS = (
     "assets/images",
     "assets/resume",
 )
+STUDIO_DIRS = (
+    "studio",
+    "assets/studio",
+)
 PHOTO_FILES = (
     "assets/photography/photography.css",
     "assets/photography/photography.js",
@@ -52,6 +56,12 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--asset-base", required=True)
     parser.add_argument("--manifest-url", required=True)
+    parser.add_argument("--include-studio", action="store_true")
+    parser.add_argument(
+        "--studio-access-protected",
+        action="store_true",
+        help="Required acknowledgement that /studio/* and /api/photo-admin/* are protected by verified Cloudflare Access",
+    )
     args = parser.parse_args()
 
     repo = args.repo.resolve()
@@ -68,6 +78,11 @@ def main() -> None:
         shutil.copytree(repo / relative, output / relative, dirs_exist_ok=True)
     for relative in PHOTO_FILES:
         copy_file(repo, output, relative)
+    if args.include_studio:
+        if not args.studio_access_protected:
+            raise ValueError("--include-studio requires --studio-access-protected")
+        for relative in STUDIO_DIRS:
+            shutil.copytree(repo / relative, output / relative, dirs_exist_ok=True)
 
     config_path = output / "assets" / "photography" / "config.js"
     config_path.parent.mkdir(parents=True, exist_ok=True)

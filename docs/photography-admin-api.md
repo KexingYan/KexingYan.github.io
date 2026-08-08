@@ -1,7 +1,9 @@
 # Photography owner API contract
 
-Status: contract only. No routes, Studio UI, authentication bypass, or upload
-handler are implemented in this phase.
+Status: Studio V1 is deployed and passed authenticated-owner and anonymous-access
+production acceptance. Pages Functions live under `functions/api/photo-admin/`;
+Cloudflare Access, migration `0003_admin_drafts.sql`, Pages bindings, server-only
+Access variables, D1, and both R2 bindings are active.
 
 ## Boundary and common behavior
 
@@ -27,9 +29,9 @@ Responses use JSON. Errors have this stable envelope:
 Expected statuses are 400 malformed request, 401 missing/invalid Access identity,
 403 valid but unauthorized identity/origin, 404 unknown record, 409 optimistic
 concurrency or ordering conflict, 413 upload too large, 415 unsupported media,
-422 valid JSON with invalid fields/state, 429 rate limited, and 500/503 internal
-or storage failure. Failed mutations commit nothing and never advance a public
-manifest pointer.
+422 valid JSON with invalid fields/state, and 500/503 internal or storage failure.
+A failed publish never leaves `current.json` advanced; failed asset writes may
+retain a failed version record or immutable orphan for later controlled cleanup.
 
 ## Read and metadata mutations
 
@@ -72,43 +74,47 @@ The list must contain each active photo in that series exactly once. A D1 batch
 updates all `sortOrder` values and the collection revision atomically. A stale or
 incomplete list returns 409/422 with no partial reorder.
 
-### `POST /api/photo-admin/photos/:id/publish`
+### `POST /api/photo-admin/publish`
 
-Body contains `expectedUpdatedAt`. Validation requires a ready asset version,
-title, slug, series, alt text, legal orientation/layout values, and a valid
-download derivative when `allowDownload=true`. The transaction changes status
-and records the publish revision. Public snapshot objects are written first;
-`current.json` is updated last. Storage failure leaves the previous public pointer
-intact and returns 503. Success returns the record and new manifest revision.
+Body contains `expectedRevision` and `confirm=true`. Validation requires every
+active record to have a ready asset version, title, slug, series, alt text, legal
+orientation/layout values, and a valid download derivative when
+`allowDownload=true`. The immutable snapshot is written and read back first;
+`current.json` is updated and read back last; only then is the D1 revision created.
+If the final D1 batch fails, the handler restores the previous `current.json`.
 
 ### `POST /api/photo-admin/photos/:id/archive`
 
-Body contains `expectedUpdatedAt`. It marks the record archived, then republishes
-the public manifest without it. R2 objects are retained; this route never deletes
-masters or immutable derivatives. Returns the archived record and new manifest
-revision.
+Body contains `expectedUpdatedAt` and `confirm=true`. It stages the record as an
+archived draft. R2 objects are retained and this route never deletes masters or
+immutable derivatives. The record disappears from the public manifest only after
+the owner separately previews and publishes the draft.
 
 ## Image ingest and replacement
 
-For the hybrid V1, the production endpoint is intentionally deferred. The same
-contract governs the local publishing command and any later server handler.
+For the hybrid V1, the browser decodes the JPEG, extracts a conservative EXIF
+subset, normalizes orientation through `createImageBitmap`, and produces four
+sRGB canvas JPEGs. The Function independently enforces Content-Type, JPEG magic
+and marker structure, encoded size, dimensions, megapixels, aspect ratio, fixed
+variant limits, and server-owned keys before writing R2. The unmodified master is
+written only to private R2.
 
 ### `POST /api/photo-admin/photos/:id/assets`
 
-Purpose: attach the first asset to a draft or replace an existing image. Use
-`multipart/form-data` with one `image` part and `expectedUpdatedAt`. A future
-direct-to-R2 flow must issue only short-lived, single-object authorization after
-the same owner checks; the browser never receives general R2 credentials.
+Purpose: attach the first asset to a draft. Use `multipart/form-data` with
+`master`, `thumbnail`, `preview`, `display`, `download`, and
+`expectedUpdatedAt`. Replacement uses `/photos/:id/replace` and an explicit
+confirmation header. The browser never receives R2 credentials.
 
 Validation order:
 
-1. Reject more than one file and unknown form parts.
-2. Accept `image/jpeg` and `image/png`. Reject HEIC until the selected decoder and
-   derivative pipeline are proven in production.
+1. Require the fixed named parts and reject unknown form-part names; the Studio
+   client sends one file for each required variant.
+2. Accept `image/jpeg` only. PNG, HEIC and other formats are rejected in V1.
 3. Enforce a 50 MiB encoded limit, suitable for the current 30–40 MB masters.
 4. Verify magic bytes independently of extension and declared MIME.
-5. Fully decode the image; reject truncation, decompression bombs, malformed
-   profiles, and decode failures.
+5. The browser fully decodes the image before upload; the Function independently
+   validates JPEG signature, marker structure and declared dimensions.
 6. Enforce at most 80 megapixels and at most 12,000 pixels on either dimension.
 7. Normalize orientation, strip metadata from derivatives, preserve only an
    approved sRGB profile, and generate all four expected JPEG derivatives.
@@ -118,16 +124,15 @@ Validation order:
    the version ready.
 
 The private master is stored as
-`photography/originals/private/<id>/v<version>/master.<approved-extension>`.
+`photography/originals/private/<id>/v<version>/master.jpg`.
 Public derivatives use `<id>-v<version>-<variant>.jpg`.
 
 Replacement is a two-phase operation. It reserves `assetVersion + 1` in
 `processing`, writes and validates new objects, then atomically marks the new
 version ready and updates the photo. On failure, the current version remains
 active and the new version is failed/abandoned for later cleanup. Immutable old
-objects are never overwritten. The response is 202 while processing or 200 when
-the local synchronous pipeline completes; it includes processing state but no
-private master URL.
+objects are never overwritten. The synchronous V1 response is 200 after storage
+verification and includes processing state but no private master URL.
 
 ## Publish guarantees
 
@@ -137,8 +142,8 @@ The public `download.src` always points to the 1800px personal-use derivative,
 never the master. Manifest generation must fail closed if a requested derivative
 or ready asset version is missing.
 
-The implementation should remain single-owner and low-volume: D1 transactions,
-R2 object versioning, an auditable publish revision, and idempotency keys for
-uploads/publish are sufficient. A general multi-user media-management system,
+The implementation remains single-owner and low-volume: D1 batches, optimistic
+revision checks, R2 object versioning, and an auditable publish revision are
+sufficient. A general multi-user media-management system,
 client-side passwords, and anonymous original downloads are explicitly out of
 scope.

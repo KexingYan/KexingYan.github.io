@@ -25,6 +25,14 @@
   let contactSheetBuilt = false;
   let touchStartX = null;
   let lastLightboxTrigger = null;
+  let lightboxSwapTimer = null;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const dialogCloseTimes = new Map([
+    [indexDialog, 220],
+    [lightbox, 260],
+    [licenseDialog, 200],
+  ]);
 
   const seriesById = new Map();
   const photoById = new Map();
@@ -110,6 +118,40 @@
     gallery.replaceChildren(fragment);
   }
 
+  function setupRevealMotion() {
+    const seriesTargets = [...gallery.querySelectorAll(".series")];
+    const photoTargets = [...gallery.querySelectorAll(".photo-figure")];
+    if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+      [...seriesTargets, ...photoTargets].forEach((target) => target.classList.add("is-revealed"));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const revealTarget = entry.target.classList.contains("series-heading")
+          ? entry.target.closest(".series")
+          : entry.target;
+        revealTarget.classList.add("is-revealed");
+        revealTarget.classList.remove("motion-pending");
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px 12% 0px", threshold: 0.08 });
+
+    seriesTargets.forEach((series) => {
+      series.classList.add("motion-pending");
+      observer.observe(series.querySelector(".series-heading"));
+    });
+
+    photoTargets.forEach((target) => {
+      if (target.classList.contains("layout-pair-right")) {
+        target.style.setProperty("--reveal-delay", "60ms");
+      }
+      target.classList.add("motion-pending");
+      observer.observe(target);
+    });
+  }
+
   function bindPhotoButtons(root) {
     root.querySelectorAll("[data-photo-id]").forEach((button) => {
       button.addEventListener("click", () => openLightboxById(button.dataset.photoId, button));
@@ -123,6 +165,7 @@
       const button = element("button", "contact-item");
       button.type = "button";
       button.setAttribute("aria-label", `Open ${photo.title}`);
+      button.style.setProperty("--index-delay", `${Math.min(index * 20, 280)}ms`);
       button.append(imageFor(photo, "thumbnail", { loading: "lazy" }));
 
       const meta = element("span", "contact-meta");
@@ -133,7 +176,7 @@
       button.append(meta, element("span", "contact-series", seriesById.get(photo.seriesId).title));
       button.addEventListener("click", () => {
         lastLightboxTrigger = indexButton;
-        indexDialog.close();
+        closeDialog(indexDialog, true);
         openLightbox(index);
       });
       fragment.append(button);
@@ -149,10 +192,28 @@
     );
   }
 
+  function showDialog(dialog) {
+    dialog.classList.remove("is-closing");
+    if (!dialog.open) dialog.showModal();
+    syncModalState();
+  }
+
+  function closeDialog(dialog, immediate = false) {
+    if (!dialog.open || dialog.classList.contains("is-closing")) return;
+    const duration = reducedMotion.matches || immediate
+      ? 0
+      : dialogCloseTimes.get(dialog) || 220;
+    if (!duration) {
+      dialog.close();
+      return;
+    }
+    dialog.classList.add("is-closing");
+    window.setTimeout(() => dialog.close(), duration);
+  }
+
   function openIndex() {
     buildContactSheet();
-    indexDialog.showModal();
-    syncModalState();
+    showDialog(indexDialog);
   }
 
   function addExifRow(list, label, value) {
@@ -189,8 +250,7 @@
     if (!lightbox.open && trigger) lastLightboxTrigger = trigger;
     currentIndex = (index + orderedPhotos.length) % orderedPhotos.length;
     renderLightbox(orderedPhotos[currentIndex]);
-    if (!lightbox.open) lightbox.showModal();
-    syncModalState();
+    showDialog(lightbox);
   }
 
   function openLightboxById(id, trigger) {
@@ -199,7 +259,18 @@
   }
 
   function moveLightbox(delta) {
-    openLightbox(currentIndex + delta);
+    currentIndex = (currentIndex + delta + orderedPhotos.length) % orderedPhotos.length;
+    if (reducedMotion.matches) {
+      renderLightbox(orderedPhotos[currentIndex]);
+      return;
+    }
+    const imageWrap = document.querySelector("#lightbox-image");
+    window.clearTimeout(lightboxSwapTimer);
+    imageWrap.classList.add("is-switching");
+    lightboxSwapTimer = window.setTimeout(() => {
+      renderLightbox(orderedPhotos[currentIndex]);
+      requestAnimationFrame(() => imageWrap.classList.remove("is-switching"));
+    }, 110);
   }
 
   function openDownloadLicense() {
@@ -207,12 +278,18 @@
     if (!photo || !photo.allowDownload) return;
     downloadConfirm.href = photo.images.download.src;
     downloadConfirm.download = `${photo.slug}-kexing-yan-personal-use.jpg`;
-    licenseDialog.showModal();
-    syncModalState();
+    showDialog(licenseDialog);
   }
 
   [indexDialog, lightbox, licenseDialog].forEach((dialog) => {
-    dialog.addEventListener("close", syncModalState);
+    dialog.addEventListener("close", () => {
+      dialog.classList.remove("is-closing");
+      syncModalState();
+    });
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeDialog(dialog);
+    });
   });
   lightbox.addEventListener("close", () => {
     if (lastLightboxTrigger && lastLightboxTrigger.isConnected) {
@@ -221,13 +298,13 @@
   });
 
   indexButton?.addEventListener("click", openIndex);
-  indexClose?.addEventListener("click", () => indexDialog.close());
-  lightboxClose?.addEventListener("click", () => lightbox.close());
+  indexClose?.addEventListener("click", () => closeDialog(indexDialog));
+  lightboxClose?.addEventListener("click", () => closeDialog(lightbox));
   previousButton?.addEventListener("click", () => moveLightbox(-1));
   nextButton?.addEventListener("click", () => moveLightbox(1));
   downloadRequest?.addEventListener("click", openDownloadLicense);
-  licenseCancel?.addEventListener("click", () => licenseDialog.close());
-  downloadConfirm?.addEventListener("click", () => licenseDialog.close());
+  licenseCancel?.addEventListener("click", () => closeDialog(licenseDialog));
+  downloadConfirm?.addEventListener("click", () => closeDialog(licenseDialog, true));
 
   lightbox.addEventListener("keydown", (event) => {
     if (licenseDialog.open) return;
@@ -239,13 +316,13 @@
     if (event.key !== "Escape") return;
     if (licenseDialog.open) {
       event.preventDefault();
-      licenseDialog.close();
+      closeDialog(licenseDialog);
     } else if (lightbox.open) {
       event.preventDefault();
-      lightbox.close();
+      closeDialog(lightbox);
     } else if (indexDialog.open) {
       event.preventDefault();
-      indexDialog.close();
+      closeDialog(indexDialog);
     }
   });
 
@@ -276,6 +353,7 @@
           .sort((a, b) => a.sortOrder - b.sortOrder)
       );
       renderSeries();
+      setupRevealMotion();
       bindPhotoButtons(document);
     })
     .catch((error) => {

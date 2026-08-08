@@ -1,31 +1,54 @@
-# Photography Studio V1 — offline prototype
+# Photography Studio V1 — local and production adapters
 
-Studio is an owner-oriented contact sheet and editing desk at `/studio/`. H0 is
-strictly local development: it has no login form, production API, R2, D1, Access,
-upload endpoint, sitemap entry, or public navigation link. Every Studio document
-uses `noindex, nofollow, noarchive`; `_headers` adds the equivalent crawler header.
-The production release builder excludes both `/studio/` and `/assets/studio/`.
+Studio is an owner-oriented contact sheet and editing desk at `/studio/`. Every
+Studio document uses `noindex, nofollow, noarchive`; `_headers` adds the
+equivalent crawler header. Studio is absent from public navigation and sitemap.
+Localhost selects `LocalPhotoAdminRepository`; production selects
+`CloudflarePhotoAdminRepository` and calls only the Access-protected API.
 
-Do not deploy the source tree directly while Studio lacks Cloudflare Access. A
-future deployment must protect `/studio/*` and `/api/photo-admin/*` and must add
-server-side Access JWT validation before the Cloudflare repository adapter is
-enabled.
+Do not deploy the source tree directly. The release builder includes Studio only
+when both `--include-studio` and `--studio-access-protected` are supplied. That
+acknowledgement is valid only after anonymous blocking and owner access are tested.
 
 ## Data boundary
 
-`LocalPhotoAdminRepository` owns local persistence. UI code calls only its
-methods:
+Both repositories implement the same UI-facing operations:
 
 - `listPhotos()` / `getPhoto(id)`
-- `saveDraft(photo)` / `publishPhoto(id)` / `archivePhoto(id)`
+- `saveDraft(photo)` / `publishChanges()` / `archivePhoto(id)`
 - `reorderPhotos(seriesId, ids)`
 - `listSeries()` / `updateSeries(series)` / `reorderSeries(ids)`
 - `prepareUpload(files)`
+- `uploadAssets(id, file, expectedUpdatedAt, replace)`
 - `exportPublicManifest()` / `exportPreviewManifest()`
 
-The local implementation stores its fixture in browser `localStorage`. The future
-`CloudflarePhotoAdminRepository` will implement the same contract against the
-authenticated admin API; view and editor code should not change.
+The local implementation stores its fixture in browser `localStorage`. The
+Cloudflare implementation uses D1 drafts, private/public R2 bindings, optimistic
+timestamps and collection revisions; UI components contain no persistence logic.
+
+## Production safety model
+
+- Cloudflare Access protects exactly `kexingyan.com/studio/*` and
+  `kexingyan.com/api/photo-admin/*`.
+- The Function verifies RS256 signature, issuer, audience, expiry, `sub`, email,
+  and a server-only owner email allowlist on every request.
+- Mutations reject unapproved origins. Errors use a stable JSON envelope and do
+  not return stack traces.
+- Existing published rows remain authoritative while changes live in
+  `photo_drafts`. Preview merges them through the same public allowlist transform.
+- Publish checks objects, writes an immutable manifest, verifies it, changes
+  `current.json` last, verifies it, then records D1 revision.
+- Archive is soft state; replacement increments `assetVersion`; no route performs
+  permanent deletion.
+
+## Production upload
+
+JPEG is the only accepted type. The browser proves it can decode the source,
+normalizes orientation, extracts approved basic EXIF, and builds 480/1280/2200/
+1800px sRGB derivatives. The server independently checks MIME, JPEG structure,
+50 MiB, 12,000px, 80MP, derivative limits and aspect ratios, assigns keys, stores
+the unchanged master privately, and verifies each derivative after public R2 put.
+Canvas output strips GPS and other source EXIF from public derivatives.
 
 `buildPublicManifest()` is an allowlist transform that includes published records
 only. Drafts and archived records never enter it, and private source/master fields
@@ -81,5 +104,6 @@ python3 scripts/validate_offline_h0.py
 python3 -m http.server 8000
 ```
 
-The browser-only repository contract suite is at `/studio/tests.html`; it is also
-noindex and excluded from production output.
+The browser-only repository contract suite is at `/studio/tests.html`. It is
+noindex, absent from public navigation and sitemap, and covered by the same
+Cloudflare Access rule as all `/studio/*` paths in production.

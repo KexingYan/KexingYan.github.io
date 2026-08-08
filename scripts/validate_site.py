@@ -451,6 +451,40 @@ def validate_studio_isolation() -> None:
         fail("Offline Studio repository attempts to call the future production admin API")
 
 
+def validate_motion_polish() -> None:
+    css = (ROOT / "assets" / "photography" / "photography.css").read_text(encoding="utf-8")
+    script = (ROOT / "assets" / "photography" / "photography.js").read_text(encoding="utf-8")
+    homepage = (ROOT / "index.html").read_text(encoding="utf-8")
+    photography_html = (ROOT / "photography" / "index.html").read_text(encoding="utf-8")
+
+    for token in (
+        "--motion-fast", "--motion-ui", "--motion-photo", "--motion-hero",
+        "--ease-standard", "--ease-photo",
+    ):
+        if token not in css:
+            fail(f"Photography motion token is missing: {token}")
+    if "@media (prefers-reduced-motion: reduce)" not in css:
+        fail("Photography CSS lacks a reduced-motion override")
+    if "IntersectionObserver" not in script or "observer.unobserve(entry.target)" not in script:
+        fail("Photography reveals are not one-shot IntersectionObserver enhancements")
+    if 'addEventListener("scroll"' in script or "addEventListener('scroll'" in script:
+        fail("Photography motion uses a continuous scroll listener")
+    if "motion-pending" in photography_html:
+        fail("Photography HTML hardcodes a hidden motion state")
+    if "motion-pending" not in homepage or "IntersectionObserver" not in homepage:
+        fail("Homepage Photography feature lacks progressive reveal enhancement")
+    for forbidden in ("gsap", "framer-motion", "three.js", "locomotive-scroll"):
+        if forbidden in (css + script + homepage).lower():
+            fail(f"Photography motion introduced a forbidden animation dependency: {forbidden}")
+    for required in (
+        'id="photo-index"', 'id="lightbox"', 'id="download-license"',
+        'event.key === "ArrowLeft"', 'event.key === "ArrowRight"',
+        'addEventListener("cancel"', "lastLightboxTrigger.focus()",
+    ):
+        if required not in photography_html + script:
+            fail(f"Photography interaction regression guard is missing: {required}")
+
+
 def main() -> int:
     validate_html()
     validate_seed_and_local_manifest()
@@ -459,6 +493,7 @@ def main() -> int:
     validate_sitemap()
     validate_cloudflare_foundation()
     validate_studio_isolation()
+    validate_motion_polish()
     if ERRORS:
         print(f"FAILED: {len(ERRORS)} issue(s)")
         for error in ERRORS:
@@ -476,6 +511,7 @@ def main() -> int:
     print("PASS: D1 schema and guarded initial seed apply locally; second seed is rejected")
     print("PASS: no generated Photography JPEG is staged for Git")
     print("PASS: Studio routes are noindex, publicly unlinked, and use an offline repository adapter")
+    print("PASS: motion uses centralized tokens, one-shot observers, progressive enhancement, and reduced-motion overrides")
     return 0
 
 
