@@ -1,0 +1,12 @@
+{
+  "local": {
+    "assetBase": "/assets/photography/generated",
+    "manifestUrl": "/assets/photography/data/photos.json"
+  },
+  "production": {
+    "assetBaseEnvironmentVariable": "PHOTOGRAPHY_ASSET_BASE",
+    "manifestUrlEnvironmentVariable": "PHOTOGRAPHY_MANIFEST_URL",
+    "expectedAssetBase": "https://images.kexingyan.com/photography/derivatives",
+    "expectedManifestUrl": "https://images.kexingyan.com/photography/manifests/current.json"
+  }
+}

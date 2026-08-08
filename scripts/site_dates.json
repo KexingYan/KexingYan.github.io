@@ -8,6 +8,20 @@
       "sitemapLastmod": "2026-07-31",
       "reason": "Meaningful profile, accessibility, metadata, and internal-link revisions through Phase 15."
     },
+    "/photography/": {
+      "dateModified": "2026-08-08",
+      "sitemapLastmod": "2026-08-08",
+      "visibleDate": false,
+      "structuredDataDateModified": null,
+      "reason": "Photography V1 production acceptance and repository consolidation."
+    },
+    "/photography/license/": {
+      "dateModified": "2026-08-08",
+      "sitemapLastmod": "2026-08-08",
+      "visibleDate": false,
+      "structuredDataDateModified": null,
+      "reason": "Photography V1 license guidance and repository consolidation."
+    },
     "/research/microloan-quantity-size/": {
       "dateModified": "2026-07-31",
       "sitemapLastmod": "2026-07-31",

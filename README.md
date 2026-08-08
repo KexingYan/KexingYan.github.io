@@ -92,8 +92,9 @@ The intended Cloudflare Pages configuration is:
 - root directory: repository root
 - build command: `python3 scripts/build_site.py`
 - build output directory: `dist`
-- required environment variables: none
-- Pages Functions / Workers routes: none
+- required public build environment variables: none
+- Pages Functions: scoped owner-only Photography admin API under `/api/photo-admin/*`
+- private bindings/secrets: configured in Cloudflare only; never stored in Git
 
 Pushing to `main` may trigger the connected Cloudflare Pages project, so push
 only after an authorized release review. Do not configure the repository root
@@ -105,7 +106,8 @@ as the output directory.
   record. No Google verification token belongs in `index.html`.
 - The homepage canonical URL is `https://kexingyan.com/`.
 - The public sitemap is `https://kexingyan.com/sitemap.xml`; it includes the
-  homepage, the canonical HTML research page, and the public research paper.
+  homepage, Photography and its license, the canonical HTML research page,
+  and the public research paper.
 - `_headers` applies `X-Robots-Tag: noindex` to résumé files. Internal
   documentation and validation source are physically absent from `dist`.
 - `robots.txt` allows ordinary search and documented AI search/citation

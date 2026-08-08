@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 MANIFEST = ROOT / "dist-manifest.json"
 DOMAIN = "kexingyan.com"
+LOCAL_PHOTOGRAPHY_ASSET_BASE = "/assets/photography/generated"
+PHOTOGRAPHY_ASSET_BASE = "https://images.kexingyan.com/photography/derivatives"
+PHOTOGRAPHY_MANIFEST_URL = "https://images.kexingyan.com/photography/manifests/current.json"
 
 # Public deployment is opt-in. Additions require an explicit review here.
 PUBLIC_FILES: dict[str, str] = {
@@ -36,9 +39,23 @@ PUBLIC_FILES: dict[str, str] = {
     "assets/icons/favicon-192x192.png": "icon",
     "assets/icons/favicon-512x512.png": "icon",
     "assets/images/kexing-yan-open-graph.png": "social-preview",
+    "assets/photography/config.js": "photography-config",
+    "assets/photography/photography.css": "stylesheet",
+    "assets/photography/photography.js": "script",
     "assets/resume/Kexing-Yan-Resume-EN.pdf": "resume",
     "assets/resume/Kexing-Yan-Resume-ZH.pdf": "resume",
+    "assets/studio/photo-admin-repository.js": "studio-script",
+    "assets/studio/studio-preview.css": "stylesheet",
+    "assets/studio/studio-preview.js": "studio-script",
+    "assets/studio/studio-tests.js": "studio-script",
+    "assets/studio/studio.css": "stylesheet",
+    "assets/studio/studio.js": "studio-script",
+    "photography/index.html": "html",
+    "photography/license/index.html": "html",
     "research/microloan-quantity-size/index.html": "html",
+    "studio/index.html": "html-private",
+    "studio/preview.html": "html-private",
+    "studio/tests.html": "html-private",
     "papers/the-quantity-and-size-of-microloans.pdf": "research-pdf",
 }
 
@@ -168,6 +185,10 @@ def validate_allowlist_references(source_root: Path) -> None:
             target = local_reference(relative, reference)
             if target is None or target == relative:
                 continue
+            if target.startswith("assets/photography/generated/"):
+                # Development HTML uses ignored local derivatives. The build
+                # rewrites these references to the versioned public R2 base.
+                continue
             if target not in allowed:
                 raise RuntimeError(
                     f"{relative} references non-public or missing file: "
@@ -222,6 +243,29 @@ def build(
                 "category": PUBLIC_FILES[relative],
             }
         )
+
+    config_path = output_root / "assets" / "photography" / "config.js"
+    config_path.write_text(
+        "window.PHOTOGRAPHY_CONFIG = Object.freeze("
+        + json.dumps(
+            {"mode": "production", "manifestUrl": PHOTOGRAPHY_MANIFEST_URL},
+            indent=2,
+        )
+        + ");\n",
+        encoding="utf-8",
+    )
+    absolute_local_base = f"https://{DOMAIN}{LOCAL_PHOTOGRAPHY_ASSET_BASE}"
+    for html_path in output_root.rglob("*.html"):
+        html = html_path.read_text(encoding="utf-8")
+        html = html.replace(absolute_local_base, PHOTOGRAPHY_ASSET_BASE)
+        html = html.replace(LOCAL_PHOTOGRAPHY_ASSET_BASE, PHOTOGRAPHY_ASSET_BASE)
+        html_path.write_text(html, encoding="utf-8")
+
+    # Recalculate records after the deterministic production rewrites.
+    for record in records:
+        destination = output_root / str(record["path"])
+        record["size"] = destination.stat().st_size
+        record["sha256"] = sha256(destination)
 
     actual = {
         path.relative_to(output_root).as_posix()

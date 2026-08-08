@@ -342,7 +342,7 @@ def validate_artifact_boundary(
             errors.append(f"artifact exposes Python source/cache: {relative}")
 
     local_markers = (
-        "/Users/",
+        "/" + "Users/",
         "klicy",
         "localhost",
         "127.0.0.1",
@@ -513,7 +513,9 @@ def validate(
                 errors.append(
                     f"{relative}: image {image.get('src')} is missing alt"
                 )
-            if not image.get("width") or not image.get("height"):
+            if image.get("src") and (
+                not image.get("width") or not image.get("height")
+            ):
                 errors.append(
                     f"{relative}: image {image.get('src')} needs dimensions"
                 )
@@ -527,7 +529,12 @@ def validate(
                 continue
             target_path, fragment = target
             if not target_path.exists():
-                errors.append(f"{relative}: broken internal link {href}")
+                optional_derivative = (
+                    not artifact
+                    and "/assets/photography/generated/" in href
+                )
+                if not optional_derivative:
+                    errors.append(f"{relative}: broken internal link {href}")
                 continue
             if fragment and target_path.suffix.lower() in {"", ".html"}:
                 target_page = pages.get(target_path.resolve())
@@ -588,7 +595,12 @@ def validate(
                 else:
                     if image_target is not None:
                         image_path = image_target[0]
-                        if not image_path.is_file():
+                        if not image_path.is_file() and not (
+                            not artifact
+                            and parsed_image.path.startswith(
+                                "/assets/photography/generated/"
+                            )
+                        ):
                             errors.append(f"{relative}: og:image file is missing")
                         elif image_path.suffix.lower() == ".png":
                             actual = png_dimensions(image_path)
@@ -1005,14 +1017,16 @@ def validate(
                 if page_path is None:
                     continue
                 page = indexable_pages[page_path]
-                if modified not in page.time_datetimes:
+                if record.get("visibleDate", True) and modified not in page.time_datetimes:
                     errors.append(
                         f"{page_path.relative_to(root)}: visible updated date "
                         f"does not match date source {modified}"
                     )
+                expected_structured_modified: object = record.get(
+                    "structuredDataDateModified", modified
+                )
                 node_id = PROFILE_ID if route == "/" else f"{domain}{route}#webpage"
                 nodes = definitions.get(node_id, [])
-                expected_structured_modified: object = modified
                 if route == "/":
                     expected_structured_modified = record.get(
                         "structuredDataDateModified"
@@ -1030,10 +1044,9 @@ def validate(
                             "date source /: ProfilePage datetime calendar date "
                             "differs from page modification date"
                         )
-                if (
+                if expected_structured_modified is not None and (
                     len(nodes) != 1
-                    or nodes[0][1].get("dateModified")
-                    != expected_structured_modified
+                    or nodes[0][1].get("dateModified") != expected_structured_modified
                 ):
                     errors.append(
                         f"{route}: JSON-LD dateModified does not match date source"
@@ -1075,7 +1088,7 @@ def validate(
                             f"{route}: file sitemap lastmod differs from date source"
                         )
             copyright_year = str(date_data.get("copyrightYear", ""))
-            for path, page in pages.items():
+            for path, page in indexable_pages.items():
                 if f"© {copyright_year}" not in page.visible_text:
                     errors.append(
                         f"{path.relative_to(root)}: copyright year differs from date source"

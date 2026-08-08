@@ -1,0 +1,8 @@
+{
+  "name": "kexingyan-photography-studio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:photo-admin": "node --test tests/test_photo_admin_backend.mjs"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://kexingyan.com",
+          "https://www.kexingyan.com"
+        ],
+        "methods": [
+          "GET",
+          "HEAD"
+        ]
+      }
+    }
+  ]
+}

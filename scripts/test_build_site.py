@@ -9,6 +9,8 @@ from pathlib import Path
 
 from build_site import (
     FORBIDDEN_TOP_LEVEL,
+    LOCAL_PHOTOGRAPHY_ASSET_BASE,
+    PHOTOGRAPHY_MANIFEST_URL,
     PUBLIC_FILES,
     ROOT,
     build,
@@ -27,13 +29,28 @@ class BuildSiteTests(unittest.TestCase):
             {path.split("/", 1)[0] for path in PUBLIC_FILES}
         ))
 
-    def test_build_preserves_every_source_byte(self) -> None:
+    def test_build_preserves_source_bytes_except_reviewed_photography_rewrites(self) -> None:
         manifest = build()
         self.assertEqual(manifest["fileCount"], len(PUBLIC_FILES))
+        transformed = {
+            "assets/photography/config.js",
+            "index.html",
+            "photography/index.html",
+            "photography/license/index.html",
+        }
         for record in manifest["files"]:
             relative = record["path"]
-            self.assertEqual(record["sha256"], sha256(ROOT / relative))
             self.assertEqual(record["sha256"], sha256(ROOT / "dist" / relative))
+            if relative not in transformed:
+                self.assertEqual(record["sha256"], sha256(ROOT / relative))
+        config = (ROOT / "dist" / "assets/photography/config.js").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('"mode": "production"', config)
+        self.assertIn(PHOTOGRAPHY_MANIFEST_URL, config)
+        for relative in transformed - {"assets/photography/config.js"}:
+            html = (ROOT / "dist" / relative).read_text(encoding="utf-8")
+            self.assertNotIn(LOCAL_PHOTOGRAPHY_ASSET_BASE, html)
 
     def test_missing_required_file_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

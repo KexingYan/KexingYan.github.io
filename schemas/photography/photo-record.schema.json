@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kexingyan.com/schemas/photography/photo-record.schema.json",
+  "title": "Authoritative Photography Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "slug",
+    "title",
+    "seriesId",
+    "alt",
+    "orientation",
+    "layoutHint",
+    "featured",
+    "allowDownload",
+    "sortOrder",
+    "status",
+    "assetVersion",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^P[0-9]{3,}$" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "seriesId": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "dateTaken": { "type": ["string", "null"], "format": "date" },
+    "datePublished": { "type": ["string", "null"], "format": "date" },
+    "locationDisplay": { "type": "string", "maxLength": 160 },
+    "caption": { "type": "string", "maxLength": 1200 },
+    "alt": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "camera": { "type": ["string", "null"], "maxLength": 160 },
+    "lens": { "type": ["string", "null"], "maxLength": 200 },
+    "focalLength": { "type": ["string", "null"], "maxLength": 40 },
+    "aperture": { "type": ["string", "null"], "maxLength": 40 },
+    "shutterSpeed": { "type": ["string", "null"], "maxLength": 40 },
+    "iso": { "type": ["integer", "null"], "minimum": 1 },
+    "orientation": { "enum": ["portrait", "landscape"] },
+    "layoutHint": {
+      "enum": ["hero", "wide", "landscape", "portrait-left", "portrait-right", "pair-left", "pair-right", "panorama", "standard"]
+    },
+    "featured": { "type": "boolean" },
+    "allowDownload": { "type": "boolean" },
+    "sortOrder": { "type": "integer", "minimum": 0 },
+    "status": { "enum": ["draft", "published", "archived"] },
+    "assetVersion": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "masterObjectKey": { "type": "string", "minLength": 1 },
+    "sourceFilename": { "type": "string", "minLength": 1 },
+    "sourceHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "originalWidth": { "type": "integer", "minimum": 1 },
+    "originalHeight": { "type": "integer", "minimum": 1 },
+    "processingState": {
+      "enum": ["accepted", "awaiting-local-processing", "processing", "ready", "failed", "superseded"]
+    }
+  }
+}

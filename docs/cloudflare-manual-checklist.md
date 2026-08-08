@@ -25,8 +25,8 @@
 | Email Address Obfuscation | Verify it does not rewrite `mailto:` links or initial HTML unexpectedly | Visible/DOM mismatch for contact links | No | Owner privacy decision; not required for SEO |
 | Rocket Loader | Inline language and active-navigation scripts must execute in order | Delayed/reordered scripts break language state | Local source only | Disable for this site only if a live regression is observed |
 | Automatic Platform Optimization | If present through another integration, confirm it does not rewrite static HTML | Stale cache or script modification | No | Not required for this static site |
-| Pages Functions / Workers routes | Confirm no catch-all function intercepts static 404, headers, redirects, or PDF | Soft 404, altered status/type | No Functions in repository | Remove or scope only conflicting external route |
-| Deployment exclusions | Confirm the deployed file list matches the 21-file `dist` manifest | Publishing the repository root exposes docs and tools | Explicit allowlist and artifact validator | Set output to `dist`; investigate any extra live file |
+| Pages Functions / Workers routes | Confirm only `/api/photo-admin/*` uses the Photography Pages Function and no catch-all intercepts static content | Soft 404, altered status/type, or an exposed admin API | Scoped Function plus Access and owner authorization | Remove or narrow any conflicting route |
+| Deployment exclusions | Confirm the deployed file list matches the 35-file `dist` manifest | Publishing the repository root exposes docs and tools | Explicit allowlist and artifact validator | Set output to `dist`; investigate any extra live file |
 | Asset cache invalidation | After metadata/image update, confirm new hash/content is served | Old OG or PDF persists | No | Purge only affected URLs if normal deploy invalidation fails |
 
 ## Crawler exception standard

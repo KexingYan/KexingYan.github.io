@@ -14,11 +14,13 @@
 - Cloudflare controls: `_headers`, `_redirects`
 - Ownership verification: `baidu_verify_codeva-vWXLKxDtXl.html`
 - Research: `research/microloan-quantity-size/index.html` and the accepted PDF
+- Photography: public gallery, license, production R2 configuration, CSS, and JS
+- Private Studio: noindex HTML/CSS/JS protected by Cloudflare Access
 - Public identity assets: referenced CSS, six browser/install icons, and the
   Open Graph image listed by `scripts/build_site.py`
 - Intentionally public noindex CVs: both linked language versions
 
-The allowlist contains 21 files. `assets/icons/kx-logo.png` is deliberately
+The allowlist contains 35 files. `assets/icons/kx-logo.png` is deliberately
 excluded because no deployed page or manifest references it.
 
 ## Files that must not deploy
@@ -38,6 +40,10 @@ excluded because no deployed page or manifest references it.
 |---|---:|---|---|---|
 | `/` | 200 | `text/html` | No redirect; platform default cache | Indexable; self-canonical |
 | `/research/microloan-quantity-size/` | 200 | `text/html` | No redirect; platform default cache | Indexable; self-canonical |
+| `/photography/` | 200 | `text/html` | Public manifest and derivatives served from `images.kexingyan.com` | Indexable; self-canonical |
+| `/photography/license/` | 200 | `text/html` | No redirect; platform default cache | Indexable; self-canonical |
+| `/studio/` | 200 after Access | `text/html` | Cloudflare Access authentication required | `noindex, nofollow` |
+| `/api/photo-admin/*` | API response after Access | Varies | Pages Functions; owner allowlist and Origin checks | Private API |
 | `/papers/the-quantity-and-size-of-microloans.pdf` | 200 | `application/pdf` | Inline; 1-hour public revalidation | Indexable |
 | `/papers` | 301 | n/a | To canonical HTML research page | Redirect source excluded from sitemap |
 | `/papers/` | 301 | n/a | To canonical HTML research page | Redirect source excluded from sitemap |
@@ -75,6 +81,8 @@ Then manually inspect Cloudflare security events and complete the checklists in
 - Root directory: repository root
 - Build command: `python3 scripts/build_site.py`
 - Build output directory: `dist`
-- Environment variables: none required or expected
-- Pages Functions: none
-- Workers routes: none expected for this static project
+- Public build environment variables: none required
+- Pages Functions: `functions/api/photo-admin/[[path]].js`
+- Function bindings/secrets: D1, public/private R2, Access JWT settings, and
+  owner allowlist configured only in Cloudflare
+- Workers routes: none expected outside the scoped Pages Functions API

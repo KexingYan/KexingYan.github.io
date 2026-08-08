@@ -18,7 +18,7 @@ browser checks did cover desktop and a 390 x 844 responsive viewport.
 |---|---|---|
 | Git status | Intentionally dirty; all Phase 0–15 plus final hardening work is uncommitted | Use the documented staged-file plan; do not force unsafe historical separation |
 | Diff | Complete tracked/untracked inventory reviewed; `git diff --check` passes | Review binary PDF/image size changes in commit summary |
-| Deployment boundary | Explicit 21-file allowlist builds `dist/` | Configure Cloudflare output as `dist`, never repository root |
+| Deployment boundary | Explicit 35-file allowlist builds `dist/` | Configure Cloudflare output as `dist`, never repository root |
 | Temporary files | PDF renders and optimization candidates are under ignored `tmp/` | Validator confirms `tmp/` absent from `dist` |
 | Local paths | No developer-machine absolute path in public site or project documentation | Re-run path scan before commit |
 | Secrets / environment files | No `.env`, key, token, credential, or analytics secret found | Keep secret scan in pre-deployment checklist |

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photography Studio · Kexing Yan</title>
+  <meta name="description" content="Owner-only photography curation and publishing studio." />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="theme-color" content="#11110f" />
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-48x48.png" />
+  <link rel="stylesheet" href="/assets/studio/studio.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="studio-header">
+    <div>
+      <p class="eyebrow">Kexing Yan / Photography Studio</p>
+      <h1>Archive</h1>
+    </div>
+    <p class="environment-note" id="environment-note"><span></span> Connecting securely…</p>
+  </header>
+
+  <main class="studio-main" id="main-content">
+    <section class="archive-summary" aria-labelledby="archive-summary-title">
+      <h2 class="visually-hidden" id="archive-summary-title">Archive summary</h2>
+      <div class="summary-copy">
+        <p><strong id="photo-count">—</strong> photographs</p>
+        <p><strong id="series-count">—</strong> series</p>
+        <p>Last published · <strong id="last-published">—</strong></p>
+      </div>
+      <div class="summary-actions">
+        <button class="button-primary" id="add-photos" type="button">+ Add photographs</button>
+        <button id="manage-series" type="button">Series</button>
+        <button id="reset-fixture" type="button">Reset local fixture</button>
+      </div>
+    </section>
+
+    <section class="archive-tools" aria-label="Archive filters">
+      <div class="status-tabs" role="group" aria-label="Status filter">
+        <button class="active" type="button" data-status="all">All</button>
+        <button type="button" data-status="draft">Drafts</button>
+        <button type="button" data-status="published">Published</button>
+        <button type="button" data-status="archived">Archived</button>
+      </div>
+      <label class="search-field">
+        <span class="visually-hidden">Search photographs by title</span>
+        <input id="photo-search" type="search" placeholder="Search by title" autocomplete="off" />
+      </label>
+      <label class="series-filter">
+        <span class="visually-hidden">Filter by series</span>
+        <select id="series-filter"><option value="all">All series</option></select>
+      </label>
+      <div class="view-switch" role="group" aria-label="Archive view">
+        <button class="active" type="button" data-view="grid" aria-label="Thumbnail view">Grid</button>
+        <button type="button" data-view="list" aria-label="Compact list view">List</button>
+      </div>
+    </section>
+
+    <p class="studio-message" id="studio-message" role="status"></p>
+    <section class="archive-grid" id="archive-grid" aria-label="Photography archive"></section>
+  </main>
+
+  <dialog class="editor-dialog" id="photo-editor" aria-labelledby="editor-title">
+    <form class="editor-shell" id="editor-form">
+      <header class="dialog-header">
+        <div>
+          <p class="eyebrow" id="editor-id">Photograph</p>
+          <h2 id="editor-title">Edit photograph</h2>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog="photo-editor" aria-label="Close editor">×</button>
+      </header>
+      <div class="editor-layout">
+        <aside class="editor-visual">
+          <img id="editor-image" alt="" />
+          <p class="processing-note" id="processing-note"></p>
+          <dl class="technical-list" id="technical-list"></dl>
+        </aside>
+        <div class="editor-fields">
+          <input id="field-id" name="id" type="hidden" />
+          <label>Title<input id="field-title" name="title" required maxlength="160" /></label>
+          <div class="field-row">
+            <label>Series<select id="field-series" name="seriesId" required></select></label>
+            <label>Date<input id="field-date" name="dateTaken" type="date" /></label>
+          </div>
+          <label>Location display<input id="field-location" name="locationDisplay" maxlength="160" /></label>
+          <label>Caption<textarea id="field-caption" name="caption" rows="3" maxlength="1200"></textarea></label>
+          <label>Alt text<textarea id="field-alt" name="alt" rows="3" required maxlength="500"></textarea></label>
+          <div class="field-row">
+            <label>Layout
+              <select id="field-layout" name="layoutHint">
+                <option>hero</option><option>wide</option><option>landscape</option>
+                <option>portrait-left</option><option>portrait-right</option>
+                <option>pair-left</option><option>pair-right</option>
+                <option>panorama</option><option>standard</option>
+              </select>
+            </label>
+            <label>Status (read-only; use Archive or Publish)
+              <select id="field-status" name="status" disabled>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="archived">Archived</option>
+              </select>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label><input id="field-featured" name="featured" type="checkbox" /> Featured</label>
+            <label><input id="field-download" name="allowDownload" type="checkbox" /> Allow personal download</label>
+          </div>
+        </div>
+      </div>
+      <footer class="editor-actions">
+        <button class="danger-quiet" id="archive-photo" type="button">Archive</button>
+        <button id="replace-photo" type="button">Replace image</button>
+        <input id="replace-file" type="file" accept="image/jpeg" hidden />
+        <span class="action-spacer"></span>
+        <button id="save-draft" type="submit">Save draft</button>
+        <button id="preview-photo" type="button">Preview</button>
+        <button class="button-primary" id="publish-photo" type="button">Publish</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="add-dialog" aria-labelledby="add-title">
+    <div class="add-shell">
+      <header class="dialog-header">
+        <div><p class="eyebrow">Private ingest desk</p><h2 id="add-title">Add to archive</h2></div>
+        <button class="icon-button" type="button" data-close-dialog="add-dialog" aria-label="Close add photographs">×</button>
+      </header>
+      <label class="drop-zone" id="drop-zone">
+        <strong>Drop photographs here</strong>
+        <span>or browse this device</span>
+        <input id="file-input" type="file" accept="image/jpeg" multiple />
+      </label>
+      <p class="honesty-note">Production accepts JPEG only. The browser creates four sRGB JPEG derivatives; the unchanged master is stored in private R2. Local development remains session-only and uses the offline Python ingest command.</p>
+      <div class="ingest-proposals" id="ingest-proposals"></div>
+    </div>
+  </dialog>
+
+  <dialog id="series-dialog" aria-labelledby="series-title">
+    <div class="series-shell">
+      <header class="dialog-header">
+        <div><p class="eyebrow">Collection structure</p><h2 id="series-title">Series</h2></div>
+        <button class="icon-button" type="button" data-close-dialog="series-dialog" aria-label="Close series editor">×</button>
+      </header>
+      <div id="series-editor-list"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/assets/studio/studio.js"></script>
+</body>
+</html>

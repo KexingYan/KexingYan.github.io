@@ -21,3 +21,8 @@
 /llms.txt
   Content-Type: text/plain; charset=utf-8
   X-Content-Type-Options: nosniff
+
+# Studio is protected by Cloudflare Access in production and remains excluded
+# from search indexing as a second layer of defense.
+/studio/*
+  X-Robots-Tag: noindex, nofollow
