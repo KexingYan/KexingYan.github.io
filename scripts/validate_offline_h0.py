@@ -18,6 +18,7 @@ def run(command: list[str]) -> None:
 
 def main() -> None:
     run([sys.executable, "scripts/validate_site.py"])
+    run([sys.executable, "scripts/validate_photography.py"])
     run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"])
     scripts = sorted(str(path.relative_to(ROOT)) for path in (ROOT / "scripts").glob("*.py"))
     run([sys.executable, "-m", "py_compile", *scripts])

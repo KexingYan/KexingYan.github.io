@@ -4,13 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Photography Studio · Kexing Yan</title>
+  <meta name="description" content="Owner-only photography curation and publishing studio." />
   <meta name="robots" content="noindex, nofollow, noarchive" />
   <meta name="referrer" content="no-referrer" />
   <meta name="theme-color" content="#11110f" />
-  <link rel="icon" type="image/png" href="/assets/icons/kx-logo.png" />
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-48x48.png" />
   <link rel="stylesheet" href="/assets/studio/studio.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="studio-header">
     <div>
       <p class="eyebrow">Kexing Yan / Photography Studio</p>
@@ -19,7 +21,7 @@
     <p class="environment-note" id="environment-note"><span></span> Connecting securely…</p>
   </header>
 
-  <main class="studio-main">
+  <main class="studio-main" id="main-content">
     <section class="archive-summary" aria-labelledby="archive-summary-title">
       <h2 class="visually-hidden" id="archive-summary-title">Archive summary</h2>
       <div class="summary-copy">
@@ -130,7 +132,7 @@
         <span>or browse this device</span>
         <input id="file-input" type="file" accept="image/jpeg" multiple />
       </label>
-      <p class="honesty-note">Production accepts JPEG only. The browser creates four sRGB JPEG derivatives; the unchanged master is stored in private R2. Localhost remains session-only and uses the offline Python ingest command.</p>
+      <p class="honesty-note">Production accepts JPEG only. The browser creates four sRGB JPEG derivatives; the unchanged master is stored in private R2. Local development remains session-only and uses the offline Python ingest command.</p>
       <div class="ingest-proposals" id="ingest-proposals"></div>
     </div>
   </dialog>

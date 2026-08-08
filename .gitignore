@@ -7,7 +7,9 @@ production-private/
 data/photography/private*.json
 __pycache__/
 *.pyc
+tmp/
 dist/
+dist-manifest.json
 .wrangler/
 .dev.vars*
 .env*

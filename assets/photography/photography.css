@@ -41,6 +41,21 @@ a {
   color: inherit;
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 10000;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  background: var(--photo-text);
+  color: var(--photo-bg);
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;

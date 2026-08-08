@@ -1,0 +1,51 @@
+name: Validate static site
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependency
+        run: python3 -m pip install Pillow
+
+      - name: Build explicit deployment artifact
+        run: python3 scripts/build_site.py
+
+      - name: Validate source and deployment artifact
+        run: |
+          python3 scripts/validate_site.py
+          python3 scripts/validate_site.py --root dist
+          python3 scripts/validate_photography.py
+          python3 scripts/validate_phase_h.py
+
+      - name: Run unit tests
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_*.py' -v
+          python3 -m unittest -v tests/test_ingest_photography.py
+          node --test tests/test_photo_admin_backend.mjs
+
+      - name: Compile Python validation tools
+        run: python3 -m compileall -q scripts tests
+
+      - name: Parse packaged sitemap
+        run: python3 -c "from xml.etree import ElementTree; ElementTree.parse('dist/sitemap.xml')"
+
+      - name: Check patch whitespace
+        run: git diff --check

@@ -1,11 +1,28 @@
 # Cloudflare Pages custom headers.
-# Keep résumé PDFs out of search indexes: they contain a plaintext personal
-# email that would otherwise be exposed to crawlers. Trade-off: the résumé
-# files themselves will not appear in search results.
+# Keep résumé PDFs from appearing as standalone search results. This is an
+# indexing preference, not a privacy control; the files remain intentionally
+# reachable from the public homepage.
 /assets/resume/*
   X-Robots-Tag: noindex
 
-# Offline owner prototype. Cloudflare Access must be attached before any future
-# production exposure, and the application API must validate Access JWTs.
+# The paper remains indexable and readable inline. Its URL is stable, so use a
+# short cache lifetime rather than immutable caching.
+/papers/the-quantity-and-size-of-microloans.pdf
+  Content-Type: application/pdf
+  Content-Disposition: inline
+  Content-Language: en-CA
+  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/assets/images/*
+  X-Content-Type-Options: nosniff
+  Cache-Control: public, max-age=86400
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  X-Content-Type-Options: nosniff
+
+# Studio is protected by Cloudflare Access in production and remains excluded
+# from search indexing as a second layer of defense.
 /studio/*
   X-Robots-Tag: noindex, nofollow

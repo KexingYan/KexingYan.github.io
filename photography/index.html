@@ -16,6 +16,7 @@
   <meta property="og:description" content="Things I noticed while wandering — a visual journal by Kexing Yan." />
   <meta property="og:site_name" content="Kexing Yan" />
   <meta property="og:image" content="https://kexingyan.com/assets/photography/generated/display/P014-v1-display.jpg" />
+  <meta property="og:image:secure_url" content="https://kexingyan.com/assets/photography/generated/display/P014-v1-display.jpg" />
   <meta property="og:image:width" content="2200" />
   <meta property="og:image:height" content="1237" />
   <meta property="og:image:alt" content="A narrow opening of sky between two dark residential buildings viewed from below." />
@@ -23,8 +24,9 @@
   <meta name="twitter:title" content="Photography | Kexing Yan" />
   <meta name="twitter:description" content="Things I noticed while wandering — a visual journal by Kexing Yan." />
   <meta name="twitter:image" content="https://kexingyan.com/assets/photography/generated/display/P014-v1-display.jpg" />
+  <meta name="twitter:image:alt" content="A narrow opening of sky between two dark residential buildings viewed from below." />
 
-  <link rel="icon" type="image/png" href="/assets/icons/kx-logo.png" />
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-48x48.png" />
   <link rel="preload" as="image"
     href="/assets/photography/generated/display/P014-v1-display.jpg"
     imagesrcset="/assets/photography/generated/preview/P014-v1-preview.jpg 1280w, /assets/photography/generated/display/P014-v1-display.jpg 2200w"
@@ -39,18 +41,14 @@
     "url": "https://kexingyan.com/photography/",
     "name": "Photography | Kexing Yan",
     "description": "A visual journal by Kexing Yan featuring urban wandering, architecture, light, gardens, and everyday observations.",
-    "creator": {
-      "@type": "Person",
-      "name": "Kexing Yan",
-      "url": "https://kexingyan.com/"
-    },
+    "creator": { "@id": "https://kexingyan.com/#person" },
     "representativeOfPage": {
       "@type": "ImageObject",
       "name": "Between Buildings",
       "contentUrl": "https://kexingyan.com/assets/photography/generated/display/P014-v1-display.jpg",
       "thumbnailUrl": "https://kexingyan.com/assets/photography/generated/thumbnail/P014-v1-thumbnail.jpg",
-      "creator": { "@type": "Person", "name": "Kexing Yan" },
-      "copyrightHolder": { "@type": "Person", "name": "Kexing Yan" },
+      "creator": { "@id": "https://kexingyan.com/#person" },
+      "copyrightHolder": { "@id": "https://kexingyan.com/#person" },
       "creditText": "Kexing Yan",
       "acquireLicensePage": "https://kexingyan.com/photography/license/"
     },
@@ -61,12 +59,13 @@
   </script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="photo-header">
     <a href="/" aria-label="Back to Kexing Yan homepage">Kexing Yan</a>
     <button type="button" id="open-index" aria-haspopup="dialog">Index</button>
   </header>
 
-  <main>
+  <main id="main-content">
     <section class="photo-intro" aria-labelledby="photography-title">
       <div>
         <p class="photo-kicker">Visual Journal · 2025—2026</p>

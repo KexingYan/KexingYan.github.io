@@ -23,6 +23,19 @@ body {
   line-height: 1.45;
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 10000;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  color: var(--ground);
+  background: var(--ink);
+  transform: translateY(-180%);
+}
+
+.skip-link:focus { transform: translateY(0); }
+
 button, input, textarea, select { font: inherit; }
 
 button, select, input, textarea {
